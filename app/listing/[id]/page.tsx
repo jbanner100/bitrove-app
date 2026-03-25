@@ -8,6 +8,7 @@ import { useAccount, useWriteContract } from 'wagmi'
 import { parseUnits, keccak256, encodePacked } from 'viem'
 import { supabase } from '../../../lib/supabase'
 import { CONTRACT_ADDRESS, CONTRACT_ABI, ERC20_ABI, TOKENS } from '../../../lib/contract'
+import XMTPChat from '../../components/XMTPChat'
 
 interface Prices {
   btc: number
@@ -224,7 +225,14 @@ export default function ListingPage() {
               <p className="text-xs mt-1" style={{ color: '#8B8B9E' }}>Price updates every 30 seconds</p>
             </div>
 
-            {/* ── Buy Button ── */}
+            {/* ── Chat Button ── */}
+              <XMTPChat
+                recipientAddress={listing.seller_address}
+                recipientLabel={`Seller ${listing.seller_address.slice(0, 6)}...${listing.seller_address.slice(-4)}`}
+                listingTitle={listing.title}
+              />
+
+              {/* ── Buy Button ── */}
             <button
               onClick={() => setShowBuyModal(true)}
               className="w-full py-4 rounded-xl font-bold text-white text-lg mb-4"
