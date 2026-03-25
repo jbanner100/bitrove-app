@@ -181,7 +181,7 @@ export default function LandingPage() {
 
         <div className="float fade-up-4" style={{ position: 'relative', maxWidth: 340, width: '100%' }}>
           <div style={{ position: 'absolute', inset: -40, background: 'radial-gradient(ellipse,rgba(247,147,26,0.15) 0%,transparent 70%)', borderRadius: '50%' }} />
-          <img src="/images/bitcoin-marketplace-hero.png" alt="Bitrove marketplace" style={{ width: '100%', borderRadius: 28, position: 'relative', zIndex: 1, boxShadow: '0 40px 80px rgba(0,0,0,0.6)' }} />
+          <Image src="/images/bitcoin-marketplace-hero.png" alt="Bitrove crypto marketplace - buy and sell with Bitcoin and Ethereum" width={340} height={480} style={{ width: '100%', borderRadius: 28, position: 'relative', zIndex: 1, boxShadow: '0 40px 80px rgba(0,0,0,0.6)' }} priority />
         </div>
       </section>
 
@@ -201,7 +201,7 @@ export default function LandingPage() {
           {steps.map((step, i) => (
             <div key={i} className={`step-card ${activeCard === i ? 'active' : ''}`} onClick={() => setActiveCard(activeCard === i ? null : i)}>
               <div style={{ height: 280, overflow: 'hidden', position: 'relative' }}>
-                <img src={step.image} alt={step.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease', transform: activeCard === i ? 'scale(1.05)' : 'scale(1)' }} />
+                <Image src={step.image} alt={step.title} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover', transition: 'transform 0.4s ease', transform: activeCard === i ? 'scale(1.05)' : 'scale(1)' }} />
                 <div style={{ position: 'absolute', top: 16, left: 16, fontFamily: 'Syne, sans-serif', fontSize: 48, fontWeight: 800, color: 'rgba(255,255,255,0.08)', lineHeight: 1 }}>{step.number}</div>
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top,rgba(19,19,26,0.8) 0%,transparent 50%)' }} />
               </div>
