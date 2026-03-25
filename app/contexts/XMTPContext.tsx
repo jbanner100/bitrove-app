@@ -29,24 +29,26 @@ export function XMTPProvider({ children }: { children: ReactNode }) {
     setLoading(true)
     try {
       const { Client } = await import('@xmtp/browser-sdk')
-      
+
       const signer = {
-        getAddress: async () => walletClient.account.address,
+        type: 'EOA' as const,
+        getIdentifier: () => ({
+          identifierKind: 'Ethereum' as const,
+          identifier: walletClient.account.address.toLowerCase(),
+        }),
         signMessage: async (message: string) => {
-          return walletClient.signMessage({ message })
+          const sig = await walletClient.signMessage({ message })
+          return sig
         },
       }
 
       const client = await Client.create(signer, {
-        env: 'production'
+        env: 'production' as const,
       })
-      
-      setXmtp(client)
 
-      // Check for unread conversations
+      setXmtp(client)
       const conversations = await client.conversations.list()
       setUnreadCount(conversations.length)
-
     } catch (e) {
       console.error('XMTP init failed:', e)
     }
