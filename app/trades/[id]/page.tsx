@@ -270,7 +270,7 @@ export default function TradeDetailPage() {
               className="text-xs"
               style={{ color: '#8B8B9E' }}
             >
-              View contract on Polygonscan →
+              View contract on Polygonscan ↗
             </a>
           </div>
         )}
