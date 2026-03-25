@@ -25,6 +25,7 @@ export default function Home() {
   const [priceLoading, setPriceLoading] = useState(true)
   const [listings, setListings] = useState<any[]>([])
   const [listingsLoading, setListingsLoading] = useState(true)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // ── Price feed ──────────────────────────────────────────────────
   useEffect(() => {
@@ -87,8 +88,26 @@ export default function Home() {
             <button onClick={() => setActiveTab('trades')} className="px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ backgroundColor: activeTab === 'trades' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'trades' ? '#fff' : '#8B8B9E' }}>My Trades</button>
           </div>
         </div>
-        <ConnectButton />
+        <div className="flex items-center gap-3">
+          <ConnectButton />
+          <button
+            className="md:hidden px-3 py-2 rounded-lg text-sm"
+            style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', color: '#F7931A' }}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            ☰
+          </button>
+        </div>
       </nav>
+
+      {/* ── Mobile Menu ── */}
+      {mobileMenuOpen && (
+        <div className="md:hidden px-6 py-4 border-b flex flex-col gap-2" style={{ borderColor: '#2A2A3A', backgroundColor: '#0A0A0F' }}>
+          <button onClick={() => { setActiveTab('buy'); setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'buy' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'buy' ? '#fff' : '#8B8B9E' }}>🛒 Buy</button>
+          <button onClick={() => { setActiveTab('sell'); setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'sell' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'sell' ? '#fff' : '#8B8B9E' }}>📦 Sell</button>
+          <button onClick={() => { setActiveTab('trades'); setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'trades' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'trades' ? '#fff' : '#8B8B9E' }}>My Trades</button>
+        </div>
+      )}
 
       {/* ── Hero Search ── */}
       <div className="text-center py-16 px-6">
@@ -125,23 +144,17 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <span style={{ color: '#F7931A' }}>₿</span>
             <span className="text-white font-mono text-sm">BTC</span>
-            <span className="font-bold" style={{ color: '#F7931A' }}>
-              {priceLoading ? 'Loading...' : `$${(prices.btc || 0).toLocaleString()} AUD`}
-            </span>
+            <span className="font-bold" style={{ color: '#F7931A' }}>{priceLoading ? 'Loading...' : `$${(prices.btc || 0).toLocaleString()} AUD`}</span>
           </div>
           <div className="flex items-center gap-2">
             <span style={{ color: '#8B8B9E' }}>Ξ</span>
             <span className="text-white font-mono text-sm">ETH</span>
-            <span className="font-bold" style={{ color: '#8B8B9E' }}>
-              {priceLoading ? 'Loading...' : `$${(prices.eth || 0).toLocaleString()} AUD`}
-            </span>
+            <span className="font-bold" style={{ color: '#8B8B9E' }}>{priceLoading ? 'Loading...' : `$${(prices.eth || 0).toLocaleString()} AUD`}</span>
           </div>
           <div className="flex items-center gap-2">
             <span style={{ color: '#00D4AA' }}>◈</span>
             <span className="text-white font-mono text-sm">USDT</span>
-            <span className="font-bold" style={{ color: '#00D4AA' }}>
-              {priceLoading ? 'Loading...' : `$${(prices.usdt || 1.58).toFixed(2)} AUD`}
-            </span>
+            <span className="font-bold" style={{ color: '#00D4AA' }}>{priceLoading ? 'Loading...' : `$${(prices.usdt || 1.58).toFixed(2)} AUD`}</span>
           </div>
           <span className="text-xs ml-auto" style={{ color: '#8B8B9E' }}>Live prices — updates every 30s</span>
         </div>
@@ -187,7 +200,7 @@ export default function Home() {
                           <div>
                             <p className="text-xs" style={{ color: '#8B8B9E' }}>Price</p>
                             <p className="font-bold text-lg" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
-                            <p className="text-xs" style={{ color: '#8B8B9E' }}>≈ ${item.aud_price.toLocaleString()} AUD</p>
+                            <p className="text-xs" style={{ color: '#8B8B9E' }}>approx ${item.aud_price.toLocaleString()} AUD</p>
                           </div>
                           <button onClick={e => { e.stopPropagation(); window.location.href = `/listing/${item.id}` }} className="px-3 py-2 rounded-lg text-xs font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>Buy Now</button>
                         </div>
@@ -218,14 +231,8 @@ export default function Home() {
         <div className="px-6 pb-16">
           <div className="max-w-2xl mx-auto text-center py-16">
             <h2 className="text-2xl font-bold text-white mb-4">My Trades</h2>
-            <p className="mb-8" style={{ color: '#8B8B9E' }}>View your active purchases and sales.</p>
-            <button
-              onClick={() => window.location.href = '/trades'}
-              className="px-8 py-4 rounded-lg font-semibold text-white text-lg"
-              style={{ backgroundColor: '#F7931A' }}
-            >
-              View My Trades
-            </button>
+            <p className="mb-8" style={{ color: '#8B8B9E' }}>Connect your wallet to view your active trades and history.</p>
+            <button onClick={() => window.location.href = '/trades'} className="px-8 py-4 rounded-lg font-semibold text-white text-lg" style={{ backgroundColor: '#F7931A' }}>View My Trades</button>
           </div>
         </div>
       )}
