@@ -50,9 +50,7 @@ export function XMTPProvider({ children }: { children: ReactNode }) {
         },
       }
 
-      const client = await Client.create(signer, {
-        env: 'production' as const,
-      })
+      const client = await Client.create(signer)
 
       setXmtp(client)
       const conversations = await client.conversations.list()
