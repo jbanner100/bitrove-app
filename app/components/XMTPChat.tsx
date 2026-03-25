@@ -57,7 +57,7 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
         id: m.id,
         content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content),
         senderAddress: m.senderInboxId,
-        sent: new Date(m.sentAtNs / 1000000n),
+        sent: new Date(Number(m.sentAtNs) / 1000000),
       })))
     } catch (e: any) {
       console.error('Chat load failed:', e)
