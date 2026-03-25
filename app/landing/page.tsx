@@ -11,6 +11,10 @@ export default function LandingPage() {
   const [submitting, setSubmitting] = useState(false)
   const [activeCard, setActiveCard] = useState<number | null>(null)
   const [scrollY, setScrollY] = useState(0)
+  const [showModal, setShowModal] = useState(false)
+  const [modalEmail, setModalEmail] = useState('')
+  const [modalSubmitted, setModalSubmitted] = useState(false)
+  const [modalSubmitting, setModalSubmitting] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
@@ -27,6 +31,22 @@ export default function LandingPage() {
     } catch (err) {}
     setSubmitted(true)
     setSubmitting(false)
+  }
+
+  const handleMarketplaceClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setShowModal(true)
+  }
+
+  const handleModalWaitlist = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!modalEmail.trim()) return
+    setModalSubmitting(true)
+    try {
+      await supabase.from('waitlist').insert([{ email: modalEmail.trim() }])
+    } catch (err) {}
+    setModalSubmitted(true)
+    setModalSubmitting(false)
   }
 
   const scrollTo = (id: string) => {
@@ -126,9 +146,9 @@ export default function LandingPage() {
           <span className="nav-link" onClick={() => scrollTo('how-it-works')}>How it Works</span>
           <span className="nav-link" onClick={() => scrollTo('why-bitrove')}>Why Bitrove</span>
           <span className="nav-link" onClick={() => scrollTo('waitlist')}>Join Waitlist</span>
-          <a href="/browse" style={{ color: '#F7931A', textDecoration: 'none', fontSize: 14, fontWeight: 600, padding: '8px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, transition: 'all 0.2s' }}>
+          <button onClick={handleMarketplaceClick} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '8px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, transition: 'all 0.2s', background: 'transparent', cursor: 'pointer' }}>
             Enter Marketplace →
-          </a>
+          </button>
         </div>
       </nav>
 
@@ -154,9 +174,9 @@ export default function LandingPage() {
           <button className="btn-primary" onClick={() => scrollTo('waitlist')} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16 }}>
             Join Waitlist
           </button>
-          <a href="/browse" style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16, fontWeight: 600, color: '#fff', textDecoration: 'none', border: '1px solid #2A2A3A', backgroundColor: '#13131A' }}>
+          <button onClick={handleMarketplaceClick} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16, fontWeight: 600, color: '#fff', border: '1px solid #2A2A3A', backgroundColor: '#13131A', cursor: 'pointer' }}>
             Browse Marketplace
-          </a>
+          </button>
         </div>
 
         <div className="float fade-up-4" style={{ position: 'relative', maxWidth: 340, width: '100%' }}>
@@ -284,6 +304,38 @@ export default function LandingPage() {
           <a href="/trades" style={{ color: '#8B8B9E', fontSize: 13, textDecoration: 'none' }}>My Trades</a>
         </div>
       </footer>
+
+      {/* ── Coming Soon Modal ── */}
+      {showModal && (
+        <div onClick={() => setShowModal(false)} style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ position: 'relative', width: '100%', maxWidth: 480, margin: '0 24px', borderRadius: 24, overflow: 'hidden', border: '1px solid rgba(247,147,26,0.3)' }}>
+            <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/images/chat.png')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.3)' }} />
+            <div style={{ position: 'relative', zIndex: 1, padding: 48, textAlign: 'center' }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>🚀</div>
+              <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: '1.8rem', fontWeight: 800, marginBottom: 12, color: '#fff' }}>Almost Ready!</h2>
+              <p style={{ color: '#8B8B9E', fontSize: 16, lineHeight: 1.6, marginBottom: 32 }}>
+                The Bitrove marketplace is not quite ready yet. Let us notify you the moment we go live.
+              </p>
+              {modalSubmitted ? (
+                <div style={{ padding: '20px', borderRadius: 12, border: '1px solid #00D4AA', backgroundColor: 'rgba(0,212,170,0.1)', marginBottom: 24 }}>
+                  <p style={{ color: '#00D4AA', fontWeight: 700 }}>🎉 You are on the list!</p>
+                  <p style={{ color: '#8B8B9E', fontSize: 14, marginTop: 4 }}>We will notify you when Bitrove goes live.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleModalWaitlist} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+                  <input type="email" placeholder="your@email.com" value={modalEmail} onChange={e => setModalEmail(e.target.value)} required style={{ padding: '14px 18px', borderRadius: 10, fontSize: 15, width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid #2A2A3A', color: '#fff', outline: 'none' }} />
+                  <button type="submit" className="btn-primary" disabled={modalSubmitting} style={{ padding: '14px 24px', borderRadius: 10, fontSize: 15, width: '100%' }}>
+                    {modalSubmitting ? 'Joining...' : 'Notify Me When Live'}
+                  </button>
+                </form>
+              )}
+              <button onClick={() => setShowModal(false)} style={{ color: '#8B8B9E', fontSize: 14, background: 'none', border: 'none', cursor: 'pointer' }}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
