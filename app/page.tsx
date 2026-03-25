@@ -66,15 +66,15 @@ export default function LandingPage() {
       number: '02',
       title: 'Buyer pays in crypto',
       subtitle: 'Accept payments directly in your wallet. No banks, no delays.',
-      detail: 'Buyers watch the live crypto price and time their purchase. When they hit Buy Now, funds are locked in a smart contract escrow on Polygon. Use the secure encrypted chat to ask the seller any questions before committing. 2% Bitrove fee applies.',
+      detail: 'Buyers watch the live crypto price and time their purchase. When they hit Buy Now, funds are locked in a smart contract escrow on Polygon. Use the secure encrypted chat to ask the seller any questions before committing. 1% Bitrove fee applies.',
       image: '/images/wallet.png',
       color: '#00D4AA',
     },
     {
       number: '03',
       title: 'Funds released on delivery',
-      subtitle: 'Bitrove escrow releases payment once delivery is confirmed.',
-      detail: 'Once the buyer receives their item — by delivery or collection — and confirms receipt, funds release automatically to your wallet. No middleman touches the money. Auto-release after 7 days if no action taken.',
+      subtitle: 'Bitrove escrow releases payment once delivery is confirmed or collected.',
+      detail: 'Once the buyer receives their item — by delivery or collection — and confirms receipt, funds release automatically to your wallet. No middleman ever touches the money.',
       image: '/images/funds.png',
       color: '#F7931A',
     },
@@ -248,9 +248,9 @@ export default function LandingPage() {
 
           <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 64, padding: 40, borderRadius: 20, border: '1px solid #2A2A3A', background: '#13131A' }}>
             {[
-              { value: '2%', label: 'Bitrove fee — lowest in the market' },
+              { value: '1%', label: 'Bitrove fee — lowest in the market' },
               { value: 'Polygon', label: 'Blockchain — fast and low cost' },
-              { value: '7 days', label: 'Auto-release if no dispute raised' },
+              { value: 'Escrow', label: 'Protection from scams — funds only release on confirmation' },
             ].map((stat, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <p style={{ fontFamily: 'Syne, sans-serif', fontSize: 36, fontWeight: 800, color: '#F7931A', marginBottom: 8 }}>{stat.value}</p>
