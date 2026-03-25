@@ -2,6 +2,7 @@
 'use client'
 
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import XMTPBadge from '../components/XMTPBadge'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 
@@ -89,6 +90,7 @@ export default function Home() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <XMTPBadge />
           <ConnectButton />
           <button
             className="md:hidden px-3 py-2 rounded-lg text-sm"

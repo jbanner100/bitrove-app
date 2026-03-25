@@ -6,6 +6,7 @@ import '@rainbow-me/rainbowkit/styles.css'
 import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { XMTPProvider } from './contexts/XMTPContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,7 +30,9 @@ export default function RootLayout({
         <WagmiProvider config={config}>
           <QueryClientProvider client={queryClient}>
             <RainbowKitProvider>
-              {children}
+              <XMTPProvider>
+                {children}
+              </XMTPProvider>
             </RainbowKitProvider>
           </QueryClientProvider>
         </WagmiProvider>
