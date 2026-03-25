@@ -59,7 +59,7 @@ export default function LandingPage() {
       title: 'List your item',
       subtitle: 'Add your physical product to the marketplace in just a few taps.',
       detail: 'Connect your wallet, set your price in AUD, choose your preferred crypto (BTC, ETH, or USDT), upload photos, and go live. No registration. No email. Your wallet is your identity.',
-      image: '/images/list item 2.png',
+      image: '/images/crypto-listing-example.png',
       color: '#F7931A',
     },
     {
@@ -67,7 +67,7 @@ export default function LandingPage() {
       title: 'Buyer pays in crypto',
       subtitle: 'Accept payments directly in your wallet. No banks, no delays.',
       detail: 'Buyers watch the live crypto price and time their purchase. When they hit Buy Now, funds are locked in a smart contract escrow on Polygon. Use the secure encrypted chat to ask the seller any questions before committing. 2% Bitrove fee applies.',
-      image: '/images/wallet.png',
+      image: '/images/crypto-wallet-payment.png',
       color: '#00D4AA',
     },
     {
@@ -75,7 +75,7 @@ export default function LandingPage() {
       title: 'Funds released on delivery',
       subtitle: 'Bitrove escrow releases payment once delivery is confirmed.',
       detail: 'Once the buyer receives their item — by delivery or collection — and confirms receipt, funds release automatically to your wallet. No middleman touches the money. Auto-release after 7 days if no action taken.',
-      image: '/images/funds.png',
+      image: '/images/escrow-funds-released.png',
       color: '#F7931A',
     },
   ]
@@ -181,7 +181,7 @@ export default function LandingPage() {
 
         <div className="float fade-up-4" style={{ position: 'relative', maxWidth: 340, width: '100%' }}>
           <div style={{ position: 'absolute', inset: -40, background: 'radial-gradient(ellipse,rgba(247,147,26,0.15) 0%,transparent 70%)', borderRadius: '50%' }} />
-          <img src="/images/Hero image.png" alt="Bitrove marketplace" style={{ width: '100%', borderRadius: 28, position: 'relative', zIndex: 1, boxShadow: '0 40px 80px rgba(0,0,0,0.6)' }} />
+          <img src="/images/bitcoin-marketplace-hero.png" alt="Bitrove marketplace" style={{ width: '100%', borderRadius: 28, position: 'relative', zIndex: 1, boxShadow: '0 40px 80px rgba(0,0,0,0.6)' }} />
         </div>
       </section>
 
@@ -309,7 +309,7 @@ export default function LandingPage() {
       {showModal && (
         <div onClick={() => setShowModal(false)} style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}>
           <div onClick={e => e.stopPropagation()} style={{ position: 'relative', width: '100%', maxWidth: 480, margin: '0 24px', borderRadius: 24, overflow: 'hidden', border: '1px solid rgba(247,147,26,0.3)' }}>
-            <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/images/chat.png')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.3)' }} />
+            <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/images/encrypted-p2p-chat.png')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.3)' }} />
             <div style={{ position: 'relative', zIndex: 1, padding: 48, textAlign: 'center' }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>🚀</div>
               <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: '1.8rem', fontWeight: 800, marginBottom: 12, color: '#fff' }}>Almost Ready!</h2>
