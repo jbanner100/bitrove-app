@@ -28,17 +28,25 @@ export function XMTPProvider({ children }: { children: ReactNode }) {
     if (!walletClient || xmtp) return
     setLoading(true)
     try {
-      const { Client } = await import('@xmtp/browser-sdk')
+      const { Client, IdentifierKind } = await import('@xmtp/browser-sdk')
+
+      const address = walletClient.account.address
 
       const signer = {
         type: 'EOA' as const,
         getIdentifier: () => ({
-          identifierKind: 'Ethereum' as const,
-          identifier: walletClient.account.address.toLowerCase(),
+          identifier: address.toLowerCase(),
+          identifierKind: IdentifierKind.Ethereum,
         }),
-        signMessage: async (message: string) => {
+        signMessage: async (message: string): Promise<Uint8Array> => {
           const sig = await walletClient.signMessage({ message })
-          return sig
+          // Convert hex signature to Uint8Array
+          const hex = sig.startsWith('0x') ? sig.slice(2) : sig
+          const bytes = new Uint8Array(hex.length / 2)
+          for (let i = 0; i < hex.length; i += 2) {
+            bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16)
+          }
+          return bytes
         },
       }
 
