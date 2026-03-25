@@ -27,7 +27,7 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
   const [conversation, setConversation] = useState<any>(null)
   const [sending, setSending] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [canMessage, setCanMessage] = useState<boolean | null>(null)
+  const [error, setError] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -42,52 +42,26 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
     setOpen(true)
     if (!xmtp) {
       await initXMTP()
-      return
     }
-    await loadConversation()
   }
 
   const loadConversation = async () => {
     if (!xmtp || !recipientAddress) return
     setLoading(true)
+    setError('')
     try {
-      // Check if recipient can receive XMTP messages
-      const canMsg = await xmtp.canMessage(recipientAddress)
-      setCanMessage(canMsg)
-
-      if (!canMsg) {
-        setLoading(false)
-        return
-      }
-
-      // Get or create conversation
-      const convo = await xmtp.conversations.newConversation(recipientAddress)
+      const convo = await xmtp.conversations.newDm(recipientAddress)
       setConversation(convo)
-
-      // Load existing messages
       const msgs = await convo.messages()
       setMessages(msgs.map((m: any) => ({
         id: m.id,
-        content: m.content,
-        senderAddress: m.senderAddress,
-        sent: m.sent,
+        content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content),
+        senderAddress: m.senderInboxId,
+        sent: new Date(m.sentAtNs / 1000000n),
       })))
-
-      // Stream new messages
-      const stream = await convo.streamMessages()
-      for await (const msg of stream) {
-        setMessages(prev => {
-          if (prev.find(m => m.id === msg.id)) return prev
-          return [...prev, {
-            id: msg.id,
-            content: msg.content,
-            senderAddress: msg.senderAddress,
-            sent: msg.sent,
-          }]
-        })
-      }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Chat load failed:', e)
+      setError('Could not load chat. Seller may not be on XMTP yet.')
     }
     setLoading(false)
   }
@@ -96,7 +70,7 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
     if (xmtp && open) {
       loadConversation()
     }
-  }, [xmtp])
+  }, [xmtp, open])
 
   const sendMessage = async () => {
     if (!conversation || !newMessage.trim() || sending) return
@@ -104,22 +78,23 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
     try {
       await conversation.send(newMessage.trim())
       setNewMessage('')
+      await loadConversation()
     } catch (e) {
       console.error('Send failed:', e)
     }
     setSending(false)
   }
 
-  const isMine = (senderAddress: string) => {
-    return senderAddress?.toLowerCase() === address?.toLowerCase()
+  const isMine = (senderInboxId: string) => {
+    return xmtp?.inboxId === senderInboxId
   }
 
   return (
-    <div>
+    <div className="mb-4">
       {/* ── Chat Button ── */}
       <button
         onClick={openChat}
-        className="w-full py-4 rounded-xl font-bold text-white text-lg mb-4 flex items-center justify-center gap-2"
+        className="w-full py-4 rounded-xl font-bold text-white text-lg flex items-center justify-center gap-2"
         style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}
       >
         💬 Chat Securely
@@ -158,25 +133,25 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
               </div>
             )}
 
-            {/* ── XMTP loading ── */}
+            {/* ── Loading ── */}
             {isConnected && (xmtpLoading || loading) && (
               <div className="flex-1 flex items-center justify-center">
                 <p style={{ color: '#8B8B9E' }}>Connecting to XMTP...</p>
               </div>
             )}
 
-            {/* ── Recipient cant receive messages ── */}
-            {isConnected && !xmtpLoading && !loading && canMessage === false && (
+            {/* ── Error ── */}
+            {isConnected && !xmtpLoading && !loading && error && (
               <div className="flex-1 flex items-center justify-center p-6 text-center">
                 <div>
-                  <p className="text-white font-semibold mb-2">Seller not yet on XMTP</p>
-                  <p className="text-xs" style={{ color: '#8B8B9E' }}>The seller needs to enable XMTP messaging by connecting their wallet to Bitrove first.</p>
+                  <p className="text-white font-semibold mb-2">Chat unavailable</p>
+                  <p className="text-xs" style={{ color: '#8B8B9E' }}>{error}</p>
                 </div>
               </div>
             )}
 
             {/* ── Messages ── */}
-            {isConnected && !xmtpLoading && !loading && canMessage === true && (
+            {isConnected && !xmtpLoading && !loading && !error && conversation && (
               <>
                 <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
                   {messages.length === 0 && (
@@ -196,7 +171,7 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
                       >
                         <p>{msg.content}</p>
                         <p className="text-xs mt-1 opacity-70">
-                          {new Date(msg.sent).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}
+                          {msg.sent.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>
