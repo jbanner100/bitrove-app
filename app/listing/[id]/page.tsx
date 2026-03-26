@@ -123,7 +123,6 @@ export default function ListingPage() {
 
     try {
       setBuyStep('approving')
-      console.log('Step 1: approving token spend...')
       const approveHash = await writeContractAsync({
         address: contractToken.address,
         abi: ERC20_ABI,
@@ -131,7 +130,6 @@ export default function ListingPage() {
         args: [CONTRACT_ADDRESS, rawAmount],
       })
 
-      console.log('Step 2: approve confirmed, funding escrow...')
 
       setBuyStep('funding')
       const fundHash = await writeContractAsync({
@@ -141,7 +139,6 @@ export default function ListingPage() {
         args: [tradeId, listing.seller_address as `0x${string}`, contractToken.address, rawAmount],
       })
       await publicClient!.waitForTransactionReceipt({ hash: fundHash })
-      console.log('Step 3: fundTrade confirmed, updating Supabase...')
 
       await supabase.from('trades').insert([{
         listing_id: listing.id,
@@ -160,7 +157,6 @@ export default function ListingPage() {
         .update({ status: 'sold' })
         .eq('id', listing.id)
 
-      console.log('Step 4: done!')
       setBuyStep('complete')
 
     } catch (e: any) {
