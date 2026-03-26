@@ -7,10 +7,10 @@ import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 interface XMTPChatProps {
-  showDeleteButton?: boolean
   recipientAddress: string
   recipientLabel?: string
   listingTitle?: string
+  showDeleteButton?: boolean
 }
 
 interface Message {
@@ -30,6 +30,7 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
   const [sending, setSending] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [deleted, setDeleted] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -38,23 +39,22 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
 
   const openChat = async () => {
     setOpen(true)
-    if (isConnected && !xmtp) {
+    if (!xmtp) {
       await initXMTP()
     }
   }
 
-  const loadConversation = async () => {
+  const loadConversation = async (showLoader = false) => {
     if (!xmtp || !recipientAddress) return
-    setLoading(true)
+    if (showLoader) setLoading(true)
     setError('')
     try {
-      
-
-
-      const { IdentifierKind } = await import("@xmtp/browser-sdk")
-      const convo = await xmtp.conversations.createDmWithIdentifier({ identifier: recipientAddress.toLowerCase(), identifierKind: IdentifierKind.Ethereum })
+      const { IdentifierKind } = await import('@xmtp/browser-sdk')
+      const convo = await xmtp.conversations.createDmWithIdentifier({
+        identifier: recipientAddress.toLowerCase(),
+        identifierKind: IdentifierKind.Ethereum,
+      })
       setConversation(convo)
-
       const msgs = await convo.messages()
       setMessages(msgs.map((m: any) => ({
         id: m.id,
@@ -64,14 +64,16 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
       })))
     } catch (e: any) {
       console.error('Chat load failed:', e)
-      setError('Could not load chat. Seller may not be on XMTP yet.')
+      setError('Could not load chat. The other party may not have set up encrypted messaging yet.')
     }
-    setLoading(false)
+    if (showLoader) setLoading(false)
   }
 
   useEffect(() => {
     if (xmtp && open) {
-      loadConversation()
+      loadConversation(true)
+      const interval = setInterval(() => loadConversation(false), 3000)
+      return () => clearInterval(interval)
     }
   }, [xmtp, open])
 
@@ -81,21 +83,39 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
     try {
       await conversation.sendText(newMessage.trim())
       setNewMessage('')
-      await loadConversation()
+      await loadConversation(false)
     } catch (e) {
       console.error('Send failed:', e)
     }
     setSending(false)
   }
 
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this conversation? This cannot be undone.')) return
+    try {
+      if (conversation) {
+        await conversation.updateConsentState('denied')
+      }
+      setConversation(null)
+      setMessages([])
+      setDeleted(true)
+      setOpen(false)
+    } catch (e) {
+      console.error('Delete failed:', e)
+    }
+  }
+
   const isMine = (senderInboxId: string) => {
     return xmtp?.inboxId === senderInboxId
   }
 
-  const showLoading = isConnected && (xmtpLoading || loading)
-  const showError = isConnected && !xmtpLoading && !loading && error
-  const showMessages = isConnected && !xmtpLoading && !loading && !error && conversation
-  const showWaiting = isConnected && !xmtpLoading && !loading && !error && !conversation
+  if (deleted) {
+    return (
+      <div className="mb-4 rounded-xl p-4 text-center" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
+        <p className="text-xs" style={{ color: '#8B8B9E' }}>Conversation deleted.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="mb-4">
@@ -122,7 +142,16 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
                 <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: '#00D4AA22', border: '1px solid #00D4AA', color: '#00D4AA' }}>
                   🔒 XMTP Encrypted
                 </span>
-                <button onClick={() => { setOpen(false); setConversation(null); setMessages([]); setError('') }} style={{ color: '#8B8B9E' }}>✕</button>
+                {showDeleteButton && conversation && (
+                  <button
+                    onClick={handleDelete}
+                    className="text-xs px-2 py-1 rounded"
+                    style={{ color: '#ff4444', border: '1px solid #ff4444', background: 'none', cursor: 'pointer' }}
+                  >
+                    Delete
+                  </button>
+                )}
+                <button onClick={() => { setOpen(false); setConversation(null); setMessages([]); setError('') }} style={{ color: '#8B8B9E', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
               </div>
             </div>
 
@@ -136,7 +165,7 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
               </div>
             )}
 
-            {showLoading && (
+            {isConnected && (xmtpLoading || loading) && (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
                   <p className="text-white mb-2">Connecting to XMTP...</p>
@@ -145,13 +174,7 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
               </div>
             )}
 
-            {showWaiting && (
-              <div className="flex-1 flex items-center justify-center">
-                <p style={{ color: '#8B8B9E' }}>Setting up chat...</p>
-              </div>
-            )}
-
-            {showError && (
+            {isConnected && !xmtpLoading && !loading && error && (
               <div className="flex-1 flex items-center justify-center p-6 text-center">
                 <div>
                   <p className="text-white font-semibold mb-2">Chat unavailable</p>
@@ -160,7 +183,7 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
               </div>
             )}
 
-            {showMessages && (
+            {isConnected && !xmtpLoading && !loading && !error && conversation && (
               <>
                 <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
                   {messages.length === 0 && (
