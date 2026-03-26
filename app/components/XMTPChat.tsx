@@ -47,14 +47,18 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
     setLoading(true)
     setError('')
     try {
-      const { IdentifierKind } = await import('@xmtp/browser-sdk')
+      const { Client, IdentifierKind } = await import('@xmtp/browser-sdk')
 
+      // Resolve wallet address to inboxId
       const identifier = {
         identifier: recipientAddress.toLowerCase(),
         identifierKind: IdentifierKind.Ethereum,
       }
 
-      const convo = await xmtp.conversations.findOrCreateDmWithIdentifier(identifier)
+      const inboxId = await Client.getOrCreateInboxId(identifier, { env: 'production' })
+      console.log('Resolved inboxId:', inboxId)
+
+      const convo = await xmtp.conversations.findOrCreateDm(inboxId)
       setConversation(convo)
 
       const msgs = await convo.messages()
