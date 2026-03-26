@@ -152,7 +152,7 @@ export default function TradesPage() {
         <div className="flex items-center gap-8">
           <a href="/" className="text-xl font-bold" style={{ color: '#F7931A' }}>Bitrove</a>
         </div>
-        <ConnectButton />
+        <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
       </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
@@ -161,7 +161,7 @@ export default function TradesPage() {
         {!isConnected ? (
           <div className="rounded-xl p-8 text-center" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
             <p className="text-white font-semibold mb-4">Connect your wallet to view your trades</p>
-            <ConnectButton />
+            <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
           </div>
         ) : (
           <div>

@@ -130,7 +130,7 @@ export default function TradeDetailPage() {
         <div className="flex items-center gap-8">
           <a href="/" className="text-xl font-bold" style={{ color: '#F7931A' }}>Bitrove</a>
         </div>
-        <ConnectButton />
+        <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
       </nav>
 
       <div className="px-6 py-4 max-w-3xl mx-auto">

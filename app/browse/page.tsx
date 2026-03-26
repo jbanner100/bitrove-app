@@ -93,7 +93,7 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-3">
           <XMTPBadge />
-          <ConnectButton />
+          <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
           <button
             className="md:hidden px-3 py-2 rounded-lg text-sm"
             style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', color: '#F7931A' }}
