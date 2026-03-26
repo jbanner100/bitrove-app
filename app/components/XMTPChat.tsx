@@ -47,8 +47,16 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
     setLoading(true)
     setError('')
     try {
-      const convo = await xmtp.conversations.newDm(recipientAddress)
+      const { IdentifierKind } = await import('@xmtp/browser-sdk')
+
+      const identifier = {
+        identifier: recipientAddress.toLowerCase(),
+        identifierKind: IdentifierKind.Ethereum,
+      }
+
+      const convo = await xmtp.conversations.findOrCreateDmWithIdentifier(identifier)
       setConversation(convo)
+
       const msgs = await convo.messages()
       setMessages(msgs.map((m: any) => ({
         id: m.id,
@@ -73,7 +81,7 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
     if (!conversation || !newMessage.trim() || sending) return
     setSending(true)
     try {
-      await conversation.send(newMessage.trim())
+      await conversation.sendText(newMessage.trim())
       setNewMessage('')
       await loadConversation()
     } catch (e) {
