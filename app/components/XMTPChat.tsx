@@ -51,7 +51,7 @@ export default function XMTPChat({ recipientAddress, recipientLabel, listingTitl
 
 
       const { IdentifierKind } = await import("@xmtp/browser-sdk")
-      const convo = await xmtp.conversations.findOrCreateDmWithIdentity({ identifier: recipientAddress.toLowerCase(), identifierKind: IdentifierKind.Ethereum })
+      const convo = await xmtp.conversations.createDmWithIdentifier({ identifier: recipientAddress.toLowerCase(), identifierKind: IdentifierKind.Ethereum })
       setConversation(convo)
 
       const msgs = await convo.messages()
