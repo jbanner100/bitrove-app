@@ -4,7 +4,7 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from 'wagmi'
+import { useAccount, useWriteContract, usePublicClient } from 'wagmi'
 import { parseUnits, keccak256, encodePacked } from 'viem'
 import { supabase } from '../../../lib/supabase'
 import { CONTRACT_ADDRESS, CONTRACT_ABI, ERC20_ABI, TOKENS } from '../../../lib/contract'
@@ -17,16 +17,16 @@ interface Prices {
 }
 
 const tokenConfig = {
-  BTC: { symbol: '₿', color: '#F7931A', decimals: 8, contractToken: 'WBTC' },
-  ETH: { symbol: 'Ξ', color: '#8B8B9E', decimals: 18, contractToken: 'WETH' },
-  USDT: { symbol: '◈', color: '#00D4AA', decimals: 6, contractToken: 'USDT' },
+  BTC:  { symbol: '₿', color: '#F7931A', decimals: 8,  contractToken: 'WBTC' },
+  ETH:  { symbol: 'Ξ', color: '#8B8B9E', decimals: 18, contractToken: 'WETH' },
+  USDT: { symbol: '◈', color: '#00D4AA', decimals: 6,  contractToken: 'USDT' },
 }
 
 const conditionColor: Record<string, string> = {
-  'New': '#00D4AA',
+  'New':      '#00D4AA',
   'Like New': '#00D4AA',
-  'Good': '#F7931A',
-  'Fair': '#8B8B9E',
+  'Good':     '#F7931A',
+  'Fair':     '#8B8B9E',
 }
 
 export default function ListingPage() {
@@ -44,7 +44,6 @@ export default function ListingPage() {
   const { writeContractAsync } = useWriteContract()
   const publicClient = usePublicClient()
 
-  // ── Fetch listing ──────────────────────────────────────────────
   useEffect(() => {
     const fetchListing = async () => {
       const { data } = await supabase
@@ -58,7 +57,6 @@ export default function ListingPage() {
     fetchListing()
   }, [params.id])
 
-  // ── Fetch prices ───────────────────────────────────────────────
   useEffect(() => {
     const fetchPrices = async () => {
       try {
@@ -125,21 +123,25 @@ export default function ListingPage() {
 
     try {
       setBuyStep('approving')
-      await writeContractAsync({
+      console.log('Step 1: approving token spend...')
+      const approveHash = await writeContractAsync({
         address: contractToken.address,
         abi: ERC20_ABI,
         functionName: 'approve',
         args: [CONTRACT_ADDRESS, rawAmount],
       })
+      await publicClient!.waitForTransactionReceipt({ hash: approveHash })
+      console.log('Step 2: approve confirmed, funding escrow...')
 
       setBuyStep('funding')
       const fundHash = await writeContractAsync({
-  address: CONTRACT_ADDRESS,
-  abi: CONTRACT_ABI,
-  functionName: 'fundTrade',
-  args: [tradeId, listing.seller_address as `0x${string}`, contractToken.address, rawAmount],
-})
-await publicClient!.waitForTransactionReceipt({ hash: fundHash })
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'fundTrade',
+        args: [tradeId, listing.seller_address as `0x${string}`, contractToken.address, rawAmount],
+      })
+      await publicClient!.waitForTransactionReceipt({ hash: fundHash })
+      console.log('Step 3: fundTrade confirmed, updating Supabase...')
 
       await supabase.from('trades').insert([{
         listing_id: listing.id,
@@ -158,6 +160,7 @@ await publicClient!.waitForTransactionReceipt({ hash: fundHash })
         .update({ status: 'sold' })
         .eq('id', listing.id)
 
+      console.log('Step 4: done!')
       setBuyStep('complete')
 
     } catch (e: any) {
@@ -170,7 +173,6 @@ await publicClient!.waitForTransactionReceipt({ hash: fundHash })
   return (
     <main className="min-h-screen" style={{ backgroundColor: '#0A0A0F' }}>
 
-      {/* ── Navbar ── */}
       <nav className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#2A2A3A' }}>
         <div className="flex items-center gap-8">
           <a href="/" className="text-xl font-bold" style={{ color: '#F7931A' }}>Bitrove</a>
@@ -178,16 +180,13 @@ await publicClient!.waitForTransactionReceipt({ hash: fundHash })
         <ConnectButton />
       </nav>
 
-      {/* ── Back ── */}
       <div className="px-6 py-4 max-w-6xl mx-auto">
         <a href="/" className="text-sm" style={{ color: '#8B8B9E' }}>← Back to listings</a>
       </div>
 
-      {/* ── Product Layout ── */}
       <div className="px-6 pb-16 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-          {/* ── Photos ── */}
           <div>
             <div className="w-full h-80 rounded-xl overflow-hidden flex items-center justify-center mb-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
               {listing.photos && listing.photos.length > 0 ? (
@@ -207,7 +206,6 @@ await publicClient!.waitForTransactionReceipt({ hash: fundHash })
             )}
           </div>
 
-          {/* ── Details ── */}
           <div>
             <div className="flex gap-2 mb-4">
               <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', color: '#8B8B9E' }}>{listing.category}</span>
@@ -218,7 +216,6 @@ await publicClient!.waitForTransactionReceipt({ hash: fundHash })
             <h1 className="text-2xl font-bold text-white mb-2">{listing.title}</h1>
             <p className="text-sm mb-6" style={{ color: '#8B8B9E' }}>📍 {listing.location}</p>
 
-            {/* ── Price Box ── */}
             <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
               <p className="text-sm mb-1" style={{ color: '#8B8B9E' }}>Settlement token</p>
               <span className="text-xs px-2 py-1 rounded-full mb-4 inline-block" style={{ backgroundColor: '#0A0A0F', border: `1px solid ${config.color}`, color: config.color }}>{listing.token}</span>
@@ -227,14 +224,12 @@ await publicClient!.waitForTransactionReceipt({ hash: fundHash })
               <p className="text-xs mt-1" style={{ color: '#8B8B9E' }}>Price updates every 30 seconds</p>
             </div>
 
-            {/* ── Chat Button ── */}
-              <XMTPChat
-                recipientAddress={listing.seller_address}
-                recipientLabel={`Seller ${listing.seller_address.slice(0, 6)}...${listing.seller_address.slice(-4)}`}
-                listingTitle={listing.title}
-              />
+            <XMTPChat
+              recipientAddress={listing.seller_address}
+              recipientLabel={`Seller ${listing.seller_address.slice(0, 6)}...${listing.seller_address.slice(-4)}`}
+              listingTitle={listing.title}
+            />
 
-              {/* ── Buy Button ── */}
             <button
               onClick={() => setShowBuyModal(true)}
               className="w-full py-4 rounded-xl font-bold text-white text-lg mb-4"
@@ -243,13 +238,11 @@ await publicClient!.waitForTransactionReceipt({ hash: fundHash })
               Buy Now — Escrow Protected
             </button>
 
-            {/* ── Escrow Info ── */}
             <div className="rounded-lg p-4 mb-6" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
               <p className="text-xs font-semibold mb-2" style={{ color: '#00D4AA' }}>✓ How escrow works</p>
               <p className="text-xs" style={{ color: '#8B8B9E' }}>Your funds are locked in a smart contract until you confirm receipt. If something goes wrong, raise a dispute and we will resolve it.</p>
             </div>
 
-            {/* ── Seller ── */}
             <div className="rounded-lg p-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
               <p className="text-xs mb-2" style={{ color: '#8B8B9E' }}>Seller</p>
               <p className="font-mono text-sm text-white">{listing.seller_address.slice(0, 6)}...{listing.seller_address.slice(-4)}</p>
@@ -257,14 +250,12 @@ await publicClient!.waitForTransactionReceipt({ hash: fundHash })
           </div>
         </div>
 
-        {/* ── Description ── */}
         <div className="mt-8 rounded-xl p-6" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
           <h2 className="text-white font-semibold mb-4">Description</h2>
           <p style={{ color: '#8B8B9E' }}>{listing.description}</p>
         </div>
       </div>
 
-      {/* ── Buy Modal ── */}
       {showBuyModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
           <div className="rounded-xl p-8 max-w-md w-full mx-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
@@ -279,7 +270,7 @@ await publicClient!.waitForTransactionReceipt({ hash: fundHash })
                   <p className="font-bold" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
                 </div>
                 <p className="text-xs mb-6" style={{ color: '#8B8B9E' }}>Once you receive your item, go to My Trades and confirm receipt to release payment to the seller.</p>
-                <button onClick={() => window.location.href = '/'} className="w-full py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>Back to Marketplace</button>
+                <button onClick={() => window.location.href = '/trades'} className="w-full py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>View My Trades</button>
               </div>
             ) : (
               <>
