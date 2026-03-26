@@ -59,12 +59,19 @@ export default function TradeDetailPage() {
       })
       console.log('Step 2: tx hash:', hash)
       await publicClient!.waitForTransactionReceipt({ hash })
-      console.log('Step 3: tx confirmed, updating Supabase...')
-      await supabase.from('trades').update({ status: 'complete' }).eq('id', trade.id)
-      console.log('Step 4: Supabase updated, updating UI...')
-      setTrade({ ...trade, status: 'complete' })
-      setSuccess('Payment released to seller. Trade complete!')
-      console.log('Step 5: done')
+      console.log('Step 3: confirmed, updating Supabase...')
+      const { error: updateError } = await supabase
+        .from('trades')
+        .update({ status: 'complete' })
+        .eq('id', trade.id)
+      if (updateError) {
+        console.error('Supabase update error:', updateError)
+        setError('Trade confirmed on-chain but failed to update UI. Please refresh.')
+      } else {
+        console.log('Step 4: Supabase updated successfully')
+        setTrade({ ...trade, status: 'complete' })
+        setSuccess('Payment released to seller. Trade complete!')
+      }
     } catch (e: any) {
       console.error('Error:', e)
       setError(e.message || 'Transaction failed')
@@ -84,9 +91,17 @@ export default function TradeDetailPage() {
         args: [trade.trade_id_onchain as `0x${string}`],
       })
       await publicClient!.waitForTransactionReceipt({ hash })
-      await supabase.from('trades').update({ status: 'disputed' }).eq('id', trade.id)
-      setTrade({ ...trade, status: 'disputed' })
-      setSuccess('Dispute raised. Bitrove will review within 48 hours.')
+      const { error: updateError } = await supabase
+        .from('trades')
+        .update({ status: 'disputed' })
+        .eq('id', trade.id)
+      if (updateError) {
+        console.error('Supabase update error:', updateError)
+        setError('Dispute raised on-chain but failed to update UI. Please refresh.')
+      } else {
+        setTrade({ ...trade, status: 'disputed' })
+        setSuccess('Dispute raised. Bitrove will review within 48 hours.')
+      }
     } catch (e: any) {
       setError(e.message || 'Transaction failed')
     }
@@ -121,7 +136,7 @@ export default function TradeDetailPage() {
       </nav>
 
       <div className="px-6 py-4 max-w-3xl mx-auto">
-        <a href="/trades" className="text-sm" style={{ color: '#8B8B9E' }}>Back to My Trades</a>
+        <a href="/trades" className="text-sm" style={{ color: '#8B8B9E' }}>← Back to My Trades</a>
       </div>
 
       <div className="max-w-3xl mx-auto px-6 pb-16">
