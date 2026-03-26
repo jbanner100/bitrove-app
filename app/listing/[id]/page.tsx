@@ -8,6 +8,7 @@ import { useAccount, useWriteContract, usePublicClient } from 'wagmi'
 import { parseUnits, keccak256, encodePacked } from 'viem'
 import { supabase } from '../../../lib/supabase'
 import { CONTRACT_ADDRESS, CONTRACT_ABI, ERC20_ABI, TOKENS } from '../../../lib/contract'
+import { encryptAddress } from '../../../lib/encryption'
 import XMTPChat from '../../components/XMTPChat'
 
 interface Prices {
@@ -147,7 +148,7 @@ export default function ListingPage() {
         aud_price: audPrice,
         token: listing.token,
         crypto_amount: cryptoAmount,
-        encrypted_address: deliveryAddress,
+        encrypted_address: encryptAddress(deliveryAddress, tradeId, address!, listing.seller_address),
         trade_id_onchain: tradeId,
         status: 'funded',
       }])

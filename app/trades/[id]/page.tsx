@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation'
 import { useAccount, useWriteContract, usePublicClient } from 'wagmi'
 import { supabase } from '../../../lib/supabase'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../../../lib/contract'
+import { decryptAddress } from '../../../lib/encryption'
 import XMTPChat from '../../components/XMTPChat'
 
 const tokenConfig: Record<string, { symbol: string, color: string }> = {
@@ -172,7 +173,7 @@ export default function TradeDetailPage() {
         {isSeller && trade.encrypted_address && (
           <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
             <p className="text-xs font-semibold mb-2" style={{ color: '#00D4AA' }}>Delivery Address</p>
-            <p className="text-sm text-white">{trade.encrypted_address}</p>
+            <p className="text-sm text-white">{decryptAddress(trade.encrypted_address, trade.trade_id_onchain, trade.buyer_address, trade.seller_address)}</p>
             <p className="text-xs mt-2" style={{ color: '#8B8B9E' }}>Ship to this address and notify the buyer once dispatched.</p>
           </div>
         )}
