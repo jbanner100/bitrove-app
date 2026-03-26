@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation'
 import { useAccount, useWriteContract, usePublicClient } from 'wagmi'
 import { supabase } from '../../../lib/supabase'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../../../lib/contract'
+import XMTPChat from '../../components/XMTPChat'
 
 const tokenConfig: Record<string, { symbol: string, color: string }> = {
   BTC:  { symbol: '₿', color: '#F7931A' },

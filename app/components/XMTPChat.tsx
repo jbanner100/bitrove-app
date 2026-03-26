@@ -7,6 +7,7 @@ import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 interface XMTPChatProps {
+  showDeleteButton?: boolean
   recipientAddress: string
   recipientLabel?: string
   listingTitle?: string
@@ -19,7 +20,7 @@ interface Message {
   sent: Date
 }
 
-export default function XMTPChat({ recipientAddress, recipientLabel, listingTitle }: XMTPChatProps) {
+export default function XMTPChat({ recipientAddress, recipientLabel, listingTitle, showDeleteButton }: XMTPChatProps) {
   const { xmtp, loading: xmtpLoading, initXMTP } = useXMTP()
   const { address, isConnected } = useAccount()
   const [open, setOpen] = useState(false)
