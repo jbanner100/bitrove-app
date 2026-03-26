@@ -130,7 +130,7 @@ export default function ListingPage() {
         functionName: 'approve',
         args: [CONTRACT_ADDRESS, rawAmount],
       })
-      await publicClient!.waitForTransactionReceipt({ hash: approveHash })
+
       console.log('Step 2: approve confirmed, funding escrow...')
 
       setBuyStep('funding')
