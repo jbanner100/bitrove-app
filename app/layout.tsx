@@ -20,7 +20,7 @@ const config = getDefaultConfig({
       http('https://polygon-mainnet.g.alchemy.com/v2/0mh3dikaN3QDHatkRQBWl'),
       http('https://polygon-rpc.com'),
     ]),
-    [mainnet.id]: http('https://eth.llamarpc.com'),
+    [mainnet.id]: http('https://ethereum.publicnode.com'),
   },
   pollingInterval: 30_000,
   ssr: false,
