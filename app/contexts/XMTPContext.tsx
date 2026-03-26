@@ -119,6 +119,20 @@ export function XMTPProvider({ children }: { children: ReactNode }) {
   }, [xmtp, walletClient, computeUnread])
 
   useEffect(() => {
+    if (walletClient && !xmtp) {
+      const key = `xmtp_registered_${walletClient.account.address.toLowerCase()}`
+      const alreadyRegistered = localStorage.getItem(key)
+      if (!alreadyRegistered) {
+        initXMTP().then(() => {
+          localStorage.setItem(key, '1')
+        })
+      } else {
+        initXMTP()
+      }
+    }
+  }, [walletClient])
+
+  useEffect(() => {
     if (!walletClient) {
       setXmtp(null)
       setUnreadCount(0)

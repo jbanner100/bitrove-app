@@ -3,6 +3,7 @@
 
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import XMTPBadge from '../components/XMTPBadge'
+import { useXMTP } from '../contexts/XMTPContext'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 
@@ -20,6 +21,7 @@ const tokenConfig = {
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('')
+  const { loading: xmtpLoading } = useXMTP()
   const [activeTab, setActiveTab] = useState('buy')
   const [activeCategory, setActiveCategory] = useState('All')
   const [prices, setPrices] = useState<Prices>({ btc: 0, eth: 0, usdt: 0 })
@@ -101,6 +103,12 @@ export default function Home() {
           </button>
         </div>
       </nav>
+
+      {xmtpLoading && (
+        <div className="px-6 py-2 text-center text-xs" style={{ backgroundColor: '#13131A', borderBottom: '1px solid #2A2A3A', color: '#F7931A' }}>
+          🔒 Setting up encrypted chat — please sign the MetaMask request (free, one-time only)
+        </div>
+      )}
 
       {/* ── Mobile Menu ── */}
       {mobileMenuOpen && (
