@@ -235,6 +235,15 @@ export default function TradeDetailPage() {
           </div>
         )}
 
+        {(isBuyer || isSeller) && (
+          <XMTPChat
+            recipientAddress={isBuyer ? trade.seller_address : trade.buyer_address}
+            recipientLabel={isBuyer ? `Seller ${trade.seller_address?.slice(0,6)}...${trade.seller_address?.slice(-4)}` : `Buyer ${trade.buyer_address?.slice(0,6)}...${trade.buyer_address?.slice(-4)}`}
+            listingTitle={trade.listings?.title}
+            showDeleteButton={true}
+          />
+        )}
+
         <div className="text-center">
           <a href={`https://polygonscan.com/address/${CONTRACT_ADDRESS}`} target="_blank" rel="noopener noreferrer" className="text-xs" style={{ color: '#8B8B9E' }}>
             View contract on Polygonscan
