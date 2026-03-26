@@ -50,17 +50,23 @@ export default function TradeDetailPage() {
     setActionLoading(true)
     setError('')
     try {
+      console.log('Step 1: sending confirmReceipt tx...')
       const hash = await writeContractAsync({
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'confirmReceipt',
         args: [trade.trade_id_onchain as `0x${string}`],
       })
+      console.log('Step 2: tx hash:', hash)
       await publicClient!.waitForTransactionReceipt({ hash })
+      console.log('Step 3: tx confirmed, updating Supabase...')
       await supabase.from('trades').update({ status: 'complete' }).eq('id', trade.id)
+      console.log('Step 4: Supabase updated, updating UI...')
       setTrade({ ...trade, status: 'complete' })
       setSuccess('Payment released to seller. Trade complete!')
+      console.log('Step 5: done')
     } catch (e: any) {
+      console.error('Error:', e)
       setError(e.message || 'Transaction failed')
     }
     setActionLoading(false)
