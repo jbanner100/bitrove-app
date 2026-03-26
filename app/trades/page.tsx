@@ -5,6 +5,8 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { supabase } from '../../lib/supabase'
+import { useXMTP } from '../../app/contexts/XMTPContext'
+import XMTPChat from '../../app/components/XMTPChat'
 
 const statusConfig: Record<string, { label: string, color: string }> = {
   funded:   { label: 'In Escrow', color: '#F7931A' },
@@ -21,11 +23,15 @@ const tokenConfig: Record<string, { symbol: string, color: string }> = {
 
 export default function TradesPage() {
   const { address, isConnected } = useAccount()
+  const { xmtp } = useXMTP()
   const [buyerTrades, setBuyerTrades] = useState<any[]>([])
   const [sellerTrades, setSellerTrades] = useState<any[]>([])
+  const [conversations, setConversations] = useState<any[]>([])
+  const [loadingChats, setLoadingChats] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'buying' | 'selling'>('buying')
+  const [activeTab, setActiveTab] = useState<'buying' | 'selling' | 'chats'>('buying')
   const [mounted, setMounted] = useState(false)
+  const [selectedConvo, setSelectedConvo] = useState<any>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -51,6 +57,25 @@ export default function TradesPage() {
     }
     fetchTrades()
   }, [address])
+
+  useEffect(() => {
+    if (activeTab === 'chats' && xmtp) {
+      loadConversations()
+    }
+  }, [activeTab, xmtp])
+
+  const loadConversations = async () => {
+    if (!xmtp) return
+    setLoadingChats(true)
+    try {
+      await xmtp.conversations.sync()
+      const convos = await xmtp.conversations.list()
+      setConversations(convos)
+    } catch (e) {
+      console.error('Failed to load conversations:', e)
+    }
+    setLoadingChats(false)
+  }
 
   const TradeCard = ({ trade, isBuyer }: { trade: any, isBuyer: boolean }) => {
     const token = tokenConfig[trade.token] || tokenConfig.BTC
@@ -83,6 +108,38 @@ export default function TradesPage() {
         >
           View Trade Details
         </button>
+      </div>
+    )
+  }
+
+  const ConvoCard = ({ convo }: { convo: any }) => {
+    const [peerAddress, setPeerAddress] = useState('')
+
+    useEffect(() => {
+      const getPeer = async () => {
+        try {
+          const peerId = await convo.peerInboxId()
+          setPeerAddress(peerId?.slice(0, 6) + '...' + peerId?.slice(-4))
+        } catch {}
+      }
+      getPeer()
+    }, [convo])
+
+    return (
+      <div
+        className="rounded-xl p-6 cursor-pointer"
+        style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}
+        onClick={() => setSelectedConvo(convo)}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-white font-semibold mb-1">💬 Conversation</p>
+            <p className="text-xs" style={{ color: '#8B8B9E' }}>With: {peerAddress || 'Loading...'}</p>
+          </div>
+          <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#00D4AA22', border: '1px solid #00D4AA', color: '#00D4AA' }}>
+            🔒 Encrypted
+          </span>
+        </div>
       </div>
     )
   }
@@ -123,9 +180,16 @@ export default function TradesPage() {
               >
                 📦 Selling ({sellerTrades.length})
               </button>
+              <button
+                onClick={() => setActiveTab('chats')}
+                className="px-6 py-2 rounded-lg font-medium transition-all"
+                style={{ backgroundColor: activeTab === 'chats' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'chats' ? '#fff' : '#8B8B9E' }}
+              >
+                💬 My Chats
+              </button>
             </div>
 
-            {loading ? (
+            {loading && activeTab !== 'chats' ? (
               <div className="text-center py-16"><p style={{ color: '#8B8B9E' }}>Loading trades...</p></div>
             ) : (
               <div className="flex flex-col gap-4">
@@ -139,6 +203,7 @@ export default function TradesPage() {
                     </div>
                   ) : buyerTrades.map(trade => <TradeCard key={trade.id} trade={trade} isBuyer={true} />)
                 )}
+
                 {activeTab === 'selling' && (
                   sellerTrades.length === 0 ? (
                     <div className="text-center py-16">
@@ -148,6 +213,45 @@ export default function TradesPage() {
                       <button onClick={() => window.location.href = '/sell'} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>List an Item</button>
                     </div>
                   ) : sellerTrades.map(trade => <TradeCard key={trade.id} trade={trade} isBuyer={false} />)
+                )}
+
+                {activeTab === 'chats' && (
+                  loadingChats ? (
+                    <div className="text-center py-16"><p style={{ color: '#8B8B9E' }}>Loading chats...</p></div>
+                  ) : !xmtp ? (
+                    <div className="text-center py-16">
+                      <p className="text-2xl mb-4">💬</p>
+                      <p className="text-white font-semibold mb-2">Setting up encrypted chat...</p>
+                      <p className="text-sm" style={{ color: '#8B8B9E' }}>Check MetaMask for a signature request</p>
+                    </div>
+                  ) : conversations.length === 0 ? (
+                    <div className="text-center py-16">
+                      <p className="text-2xl mb-4">💬</p>
+                      <p className="text-white font-semibold mb-2">No chats yet</p>
+                      <p className="text-sm" style={{ color: '#8B8B9E' }}>Start a conversation from a listing page</p>
+                    </div>
+                  ) : (
+                    <>
+                      {selectedConvo ? (
+                        <div>
+                          <button
+                            onClick={() => setSelectedConvo(null)}
+                            className="text-sm mb-4"
+                            style={{ color: '#8B8B9E', background: 'none', border: 'none', cursor: 'pointer' }}
+                          >
+                            ← Back to chats
+                          </button>
+                          <XMTPChat
+                            recipientAddress={address || ''}
+                            showDeleteButton={true}
+                            existingConversation={selectedConvo}
+                          />
+                        </div>
+                      ) : (
+                        conversations.map((convo, i) => <ConvoCard key={i} convo={convo} />)
+                      )}
+                    </>
+                  )
                 )}
               </div>
             )}
