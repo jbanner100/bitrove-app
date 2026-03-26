@@ -1,6 +1,6 @@
 import BitroveEscrowABI from './BitroveEscrow.json'
 
-export const CONTRACT_ADDRESS = '0x8bf658dfb8ea76a47c77e07a5beff85647f19a24' as `0x${string}`
+export const CONTRACT_ADDRESS = '0xbc9359071020025f1a13f34a48376e1cff839377' as `0x${string}`
 
 export const CONTRACT_ABI = BitroveEscrowABI.abi
 
