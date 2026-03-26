@@ -4,7 +4,7 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { useAccount, useWriteContract } from 'wagmi'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from 'wagmi'
 import { parseUnits, keccak256, encodePacked } from 'viem'
 import { supabase } from '../../../lib/supabase'
 import { CONTRACT_ADDRESS, CONTRACT_ABI, ERC20_ABI, TOKENS } from '../../../lib/contract'
@@ -42,6 +42,7 @@ export default function ListingPage() {
   const [error, setError] = useState('')
 
   const { writeContractAsync } = useWriteContract()
+  const publicClient = usePublicClient()
 
   // ── Fetch listing ──────────────────────────────────────────────
   useEffect(() => {
@@ -132,12 +133,13 @@ export default function ListingPage() {
       })
 
       setBuyStep('funding')
-      await writeContractAsync({
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'fundTrade',
-        args: [tradeId, listing.seller_address as `0x${string}`, contractToken.address, rawAmount],
-      })
+      const fundHash = await writeContractAsync({
+  address: CONTRACT_ADDRESS,
+  abi: CONTRACT_ABI,
+  functionName: 'fundTrade',
+  args: [tradeId, listing.seller_address as `0x${string}`, contractToken.address, rawAmount],
+})
+await publicClient!.waitForTransactionReceipt({ hash: fundHash })
 
       await supabase.from('trades').insert([{
         listing_id: listing.id,
