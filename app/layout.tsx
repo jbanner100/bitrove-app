@@ -7,6 +7,7 @@ import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { XMTPProvider } from './contexts/XMTPContext'
+import { http } from 'wagmi'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,6 +15,10 @@ const config = getDefaultConfig({
   appName: 'Bitrove',
   projectId: '0eb130b0b50beb76b7d9131c43f926f5',
   chains: [polygon, mainnet],
+  transports: {
+    [polygon.id]: http('https://polygon-mainnet.g.alchemy.com/v2/0mh3dikaN3QDHatkRQBWl'),
+    [mainnet.id]: http('https://eth.llamarpc.com'),
+  },
   ssr: false,
 })
 
