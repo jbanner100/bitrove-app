@@ -4,7 +4,7 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { useAccount, useWriteContract } from 'wagmi'
+import { useAccount, useWriteContract, usePublicClient } from 'wagmi'
 import { supabase } from '../../../lib/supabase'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../../../lib/contract'
 
@@ -30,6 +30,7 @@ export default function TradeDetailPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const { writeContractAsync } = useWriteContract()
+  const publicClient = usePublicClient()
 
   useEffect(() => {
     const fetchTrade = async () => {
@@ -49,12 +50,13 @@ export default function TradeDetailPage() {
     setActionLoading(true)
     setError('')
     try {
-      await writeContractAsync({
+      const hash = await writeContractAsync({
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'confirmReceipt',
         args: [trade.trade_id_onchain as `0x${string}`],
       })
+      await publicClient!.waitForTransactionReceipt({ hash })
       await supabase.from('trades').update({ status: 'complete' }).eq('id', trade.id)
       setTrade({ ...trade, status: 'complete' })
       setSuccess('Payment released to seller. Trade complete!')
@@ -69,12 +71,13 @@ export default function TradeDetailPage() {
     setActionLoading(true)
     setError('')
     try {
-      await writeContractAsync({
+      const hash = await writeContractAsync({
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'raiseDispute',
         args: [trade.trade_id_onchain as `0x${string}`],
       })
+      await publicClient!.waitForTransactionReceipt({ hash })
       await supabase.from('trades').update({ status: 'disputed' }).eq('id', trade.id)
       setTrade({ ...trade, status: 'disputed' })
       setSuccess('Dispute raised. Bitrove will review within 48 hours.')
