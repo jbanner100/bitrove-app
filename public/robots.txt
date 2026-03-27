@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /browse
+Disallow: /sell
+Disallow: /listing
+Disallow: /trades
+Disallow: /api
+
+Sitemap: https://bitrove.com.au/sitemap.xml
