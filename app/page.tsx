@@ -16,6 +16,16 @@ export default function LandingPage() {
   const [modalSubmitted, setModalSubmitted] = useState(false)
   const [modalSubmitting, setModalSubmitting] = useState(false)
 
+  // Early access
+  const [showEarlyAccess, setShowEarlyAccess] = useState(false)
+  const [showCodeEntry, setShowCodeEntry] = useState(false)
+  const [earlyAccessForm, setEarlyAccessForm] = useState({ name: '', email: '', wallet: '', whatList: '' })
+  const [earlyAccessSubmitted, setEarlyAccessSubmitted] = useState(false)
+  const [earlyAccessSubmitting, setEarlyAccessSubmitting] = useState(false)
+  const [accessCode, setAccessCode] = useState('')
+  const [codeError, setCodeError] = useState('')
+  const [codeChecking, setCodeChecking] = useState(false)
+
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
     window.addEventListener('scroll', handleScroll)
@@ -47,6 +57,54 @@ export default function LandingPage() {
     } catch (err) {}
     setModalSubmitted(true)
     setModalSubmitting(false)
+  }
+
+  const handleEarlyAccessSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!earlyAccessForm.name || !earlyAccessForm.email || !earlyAccessForm.wallet) return
+    setEarlyAccessSubmitting(true)
+    try {
+      await supabase.from('early_access').insert([{
+        name: earlyAccessForm.name,
+        email: earlyAccessForm.email,
+        wallet_address: earlyAccessForm.wallet,
+        what_would_you_list: earlyAccessForm.whatList,
+        status: 'pending',
+      }])
+    } catch (err) {}
+    setEarlyAccessSubmitted(true)
+    setEarlyAccessSubmitting(false)
+  }
+
+  const handleCodeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setCodeError('')
+    setCodeChecking(true)
+    const code = accessCode.trim().toUpperCase()
+    // Admin code — hardcoded, never in database
+    if (code === 'BITROVE-ADMIN-2026') {
+      localStorage.setItem('bitrove_access', 'granted')
+      window.location.href = '/browse'
+      return
+    }
+    // Check user code in Supabase
+    try {
+      const { data } = await supabase
+        .from('early_access')
+        .select('id, status')
+        .eq('access_code', code)
+        .eq('status', 'approved')
+        .single()
+      if (data) {
+        localStorage.setItem('bitrove_access', 'granted')
+        window.location.href = '/browse'
+      } else {
+        setCodeError('Invalid or unrecognised code. Please check and try again.')
+      }
+    } catch (err) {
+      setCodeError('Invalid or unrecognised code. Please check and try again.')
+    }
+    setCodeChecking(false)
   }
 
   const scrollTo = (id: string) => {
@@ -174,8 +232,8 @@ export default function LandingPage() {
           <button className="btn-primary" onClick={() => scrollTo('waitlist')} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16 }}>
             Join Waitlist
           </button>
-          <button onClick={handleMarketplaceClick} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16, fontWeight: 600, color: '#fff', border: '1px solid #2A2A3A', backgroundColor: '#13131A', cursor: 'pointer' }}>
-            Browse Marketplace
+          <button onClick={() => setShowCodeEntry(true)} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16, fontWeight: 600, color: '#fff', border: '1px solid #2A2A3A', backgroundColor: '#13131A', cursor: 'pointer' }}>
+            Request Early Access
           </button>
         </div>
 
@@ -342,6 +400,83 @@ export default function LandingPage() {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+    </main>
+
+      {/* ── Early Access Code Entry Modal ── */}
+      {showCodeEntry && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', borderRadius: 24, padding: 40, maxWidth: 440, width: '100%', position: 'relative' }}>
+            <button onClick={() => { setShowCodeEntry(false); setCodeError('') }} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: '#8B8B9E', fontSize: 20, cursor: 'pointer' }}>✕</button>
+            <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontSize: '1.5rem', fontWeight: 800, marginBottom: 8 }}>Early Access</h2>
+            <p style={{ color: '#8B8B9E', fontSize: 14, marginBottom: 32 }}>Have an access code? Enter it below. Otherwise request access and we'll be in touch.</p>
+
+            <form onSubmit={handleCodeSubmit}>
+              <input
+                type="text"
+                placeholder="Enter your access code"
+                value={accessCode}
+                onChange={e => setAccessCode(e.target.value)}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: 12, backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A', color: '#fff', fontSize: 14, marginBottom: 12, boxSizing: 'border-box', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+              />
+              {codeError && <p style={{ color: '#ff4444', fontSize: 12, marginBottom: 12 }}>{codeError}</p>}
+              <button type="submit" disabled={!accessCode.trim() || codeChecking} style={{ width: '100%', padding: '14px', borderRadius: 12, backgroundColor: accessCode.trim() ? '#F7931A' : '#2A2A3A', color: '#fff', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', marginBottom: 16 }}>
+                {codeChecking ? 'Checking...' : 'Enter Marketplace'}
+              </button>
+            </form>
+
+            <div style={{ borderTop: '1px solid #2A2A3A', paddingTop: 16, textAlign: 'center' }}>
+              <p style={{ color: '#8B8B9E', fontSize: 13, marginBottom: 12 }}>Don't have a code yet?</p>
+              <button onClick={() => { setShowCodeEntry(false); setShowEarlyAccess(true) }} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, background: 'none', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, padding: '8px 20px', cursor: 'pointer' }}>
+                Request Early Access →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Early Access Request Modal ── */}
+      {showEarlyAccess && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', borderRadius: 24, padding: 40, maxWidth: 480, width: '100%', position: 'relative', maxHeight: '90vh', overflowY: 'auto' }}>
+            <button onClick={() => { setShowEarlyAccess(false); setEarlyAccessSubmitted(false) }} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: '#8B8B9E', fontSize: 20, cursor: 'pointer' }}>✕</button>
+
+            {earlyAccessSubmitted ? (
+              <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                <p style={{ fontSize: 40, marginBottom: 16 }}>🎉</p>
+                <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontSize: '1.5rem', fontWeight: 800, marginBottom: 12 }}>Request Received!</h2>
+                <p style={{ color: '#8B8B9E', fontSize: 14, lineHeight: 1.6 }}>Thanks for your interest in Bitrove early access. We'll review your application and send you an access code shortly.</p>
+              </div>
+            ) : (
+              <>
+                <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontSize: '1.5rem', fontWeight: 800, marginBottom: 8 }}>Request Early Access</h2>
+                <p style={{ color: '#8B8B9E', fontSize: 14, marginBottom: 32, lineHeight: 1.6 }}>Bitrove is in early access. Tell us about yourself and we'll send you a code to get in.</p>
+
+                <form onSubmit={handleEarlyAccessSubmit}>
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={{ color: '#8B8B9E', fontSize: 12, display: 'block', marginBottom: 6 }}>Your Name *</label>
+                    <input type="text" placeholder="e.g. James" value={earlyAccessForm.name} onChange={e => setEarlyAccessForm(p => ({ ...p, name: e.target.value }))} style={{ width: '100%', padding: '12px 16px', borderRadius: 12, backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A', color: '#fff', fontSize: 14, boxSizing: 'border-box' }} />
+                  </div>
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={{ color: '#8B8B9E', fontSize: 12, display: 'block', marginBottom: 6 }}>Email Address *</label>
+                    <input type="email" placeholder="you@example.com" value={earlyAccessForm.email} onChange={e => setEarlyAccessForm(p => ({ ...p, email: e.target.value }))} style={{ width: '100%', padding: '12px 16px', borderRadius: 12, backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A', color: '#fff', fontSize: 14, boxSizing: 'border-box' }} />
+                  </div>
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={{ color: '#8B8B9E', fontSize: 12, display: 'block', marginBottom: 6 }}>Wallet Address *</label>
+                    <input type="text" placeholder="0x..." value={earlyAccessForm.wallet} onChange={e => setEarlyAccessForm(p => ({ ...p, wallet: e.target.value }))} style={{ width: '100%', padding: '12px 16px', borderRadius: 12, backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A', color: '#fff', fontSize: 14, boxSizing: 'border-box', fontFamily: 'monospace' }} />
+                  </div>
+                  <div style={{ marginBottom: 24 }}>
+                    <label style={{ color: '#8B8B9E', fontSize: 12, display: 'block', marginBottom: 6 }}>What would you list on Bitrove?</label>
+                    <textarea placeholder="e.g. Electronics, collectibles, my old paragliding gear..." value={earlyAccessForm.whatList} onChange={e => setEarlyAccessForm(p => ({ ...p, whatList: e.target.value }))} rows={3} style={{ width: '100%', padding: '12px 16px', borderRadius: 12, backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A', color: '#fff', fontSize: 14, boxSizing: 'border-box', resize: 'none' }} />
+                  </div>
+                  <button type="submit" disabled={!earlyAccessForm.name || !earlyAccessForm.email || !earlyAccessForm.wallet || earlyAccessSubmitting} style={{ width: '100%', padding: '14px', borderRadius: 12, backgroundColor: earlyAccessForm.name && earlyAccessForm.email && earlyAccessForm.wallet ? '#F7931A' : '#2A2A3A', color: '#fff', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}>
+                    {earlyAccessSubmitting ? 'Submitting...' : 'Request Access →'}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         </div>
       )}

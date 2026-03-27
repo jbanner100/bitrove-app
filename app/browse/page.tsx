@@ -21,6 +21,14 @@ const tokenConfig = {
 }
 
 export default function Home() {
+  // Early access guard
+  useEffect(() => {
+    const access = localStorage.getItem('bitrove_access')
+    if (access !== 'granted') {
+      window.location.href = '/'
+    }
+  }, [])
+
   const [searchQuery, setSearchQuery] = useState('')
   const { loading: xmtpLoading } = useXMTP()
   const [activeTab, setActiveTab] = useState('buy')
