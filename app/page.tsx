@@ -181,7 +181,16 @@ export default function LandingPage() {
 
         <div className="float fade-up-4" style={{ position: 'relative', maxWidth: 340, width: '100%' }}>
           <div style={{ position: 'absolute', inset: -40, background: 'radial-gradient(ellipse,rgba(247,147,26,0.15) 0%,transparent 70%)', borderRadius: '50%' }} />
-          <Image src="/images/bitcoin-marketplace-hero.png" alt="Bitrove crypto marketplace - buy and sell with Bitcoin and Ethereum" width={340} height={480} style={{ width: '100%', borderRadius: 28, position: 'relative', zIndex: 1, boxShadow: '0 40px 80px rgba(0,0,0,0.6)' }} priority />
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            controls={false}
+            style={{ width: '100%', borderRadius: 28, position: 'relative', zIndex: 1, boxShadow: '0 40px 80px rgba(0,0,0,0.6)', display: 'block' }}
+          >
+            <source src="/images/hero-video.mp4" type="video/mp4" />
+          </video>
         </div>
       </section>
 
