@@ -61,7 +61,7 @@ export default function LandingPage() {
 
   const handleEarlyAccessSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!earlyAccessForm.name || !earlyAccessForm.email || !earlyAccessForm.wallet) return
+    if (!earlyAccessForm.name || !earlyAccessForm.email) return
     setEarlyAccessSubmitting(true)
     try {
       await supabase.from('early_access').insert([{
@@ -470,7 +470,7 @@ export default function LandingPage() {
                     <label style={{ color: '#8B8B9E', fontSize: 12, display: 'block', marginBottom: 6 }}>What would you list on Bitrove?</label>
                     <textarea placeholder="e.g. Electronics, collectibles, my old paragliding gear..." value={earlyAccessForm.whatList} onChange={e => setEarlyAccessForm(p => ({ ...p, whatList: e.target.value }))} rows={3} style={{ width: '100%', padding: '12px 16px', borderRadius: 12, backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A', color: '#fff', fontSize: 14, boxSizing: 'border-box', resize: 'none' }} />
                   </div>
-                  <button type="submit" disabled={!earlyAccessForm.name || !earlyAccessForm.email || !earlyAccessForm.wallet || earlyAccessSubmitting} style={{ width: '100%', padding: '14px', borderRadius: 12, backgroundColor: earlyAccessForm.name && earlyAccessForm.email && earlyAccessForm.wallet ? '#F7931A' : '#2A2A3A', color: '#fff', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}>
+                  <button type="submit" disabled={!earlyAccessForm.name || !earlyAccessForm.email || !earlyAccessForm.wallet || earlyAccessSubmitting} style={{ width: '100%', padding: '14px', borderRadius: 12, backgroundColor: earlyAccessForm.name && earlyAccessForm.email ? '#F7931A' : '#2A2A3A', color: '#fff', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}>
                     {earlyAccessSubmitting ? 'Submitting...' : 'Request Access →'}
                   </button>
                 </form>
