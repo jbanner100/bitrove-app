@@ -82,7 +82,7 @@ export default function ListingPage() {
     }
     fetchPrices()
     const interval = setInterval(fetchPrices, 30000)
-    const handleReport = async () => {
+  const handleReport = async () => {
     if (!reportReason) return
     setReportSubmitting(true)
     try {
