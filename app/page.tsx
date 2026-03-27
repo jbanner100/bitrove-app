@@ -225,7 +225,7 @@ export default function LandingPage() {
         </h1>
 
         <p className="fade-up-2" style={{ fontSize: 20, color: '#8B8B9E', marginBottom: 40, maxWidth: 540, lineHeight: 1.6 }}>
-          The marketplace that rewards you for watching the market. No middleman. No banks. Just crypto.
+          The <span style={{ color: '#00D4AA' }}>DeFi</span> marketplace. No middleman. No banks. Just crypto.
         </p>
 
         <div className="fade-up-3" style={{ display: 'flex', gap: 16, marginBottom: 80, flexWrap: 'wrap', justifyContent: 'center' }}>
