@@ -225,7 +225,33 @@ export default function LandingPage() {
         </h1>
 
         <p className="fade-up-2" style={{ fontSize: 20, color: '#8B8B9E', marginBottom: 40, maxWidth: 540, lineHeight: 1.6 }}>
-          The <span style={{ color: '#00D4AA' }}>DeFi</span> marketplace. No middleman. No banks. Just crypto.
+          <span id="rotating-tagline">The <span style={{ color: '#00D4AA' }}>DeFi</span> marketplace. Self custody. No KYC. Secure and private.</span>
+          <style>{`
+            #rotating-tagline { transition: opacity 0.8s ease-in-out; }
+            #rotating-tagline.fade { opacity: 0; }
+          `}</style>
+          <script dangerouslySetInnerHTML={{ __html: `
+            (function() {
+              var taglines = [
+                'The <span style="color:#00D4AA">DeFi</span> marketplace. Self custody. No KYC. Secure and private.',
+                'The <span style="color:#00D4AA">DeFi</span> marketplace that rewards you for watching the market.',
+                'The <span style="color:#00D4AA">DeFi</span> marketplace. Your wallet. Your rules. No middleman.',
+                'The <span style="color:#00D4AA">DeFi</span> marketplace for the real world. No banks. Just crypto.'
+              ];
+              var i = 0;
+              var el = document.getElementById('rotating-tagline');
+              setInterval(function() {
+                if (!el) { el = document.getElementById('rotating-tagline'); }
+                if (!el) return;
+                el.classList.add('fade');
+                setTimeout(function() {
+                  i = (i + 1) % taglines.length;
+                  el.innerHTML = taglines[i];
+                  el.classList.remove('fade');
+                }, 800);
+              }, 4000);
+            })();
+          ` }} />
         </p>
 
         <div className="fade-up-3" style={{ display: 'flex', gap: 16, marginBottom: 80, flexWrap: 'wrap', justifyContent: 'center' }}>
