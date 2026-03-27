@@ -276,13 +276,13 @@ export default function Home() {
                 <button onClick={() => window.location.href = '/sell'} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>List an Item</button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {listings.map((item) => {
                   const config = tokenConfig[item.token as keyof typeof tokenConfig]
                   const cryptoPrice = getPrice(item.aud_price, item.token)
                   return (
                     <div key={item.id} onClick={() => window.location.href = `/listing/${item.id}`} className="rounded-xl overflow-hidden cursor-pointer transition-all" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }} onMouseEnter={e => (e.currentTarget.style.borderColor = '#F7931A')} onMouseLeave={e => (e.currentTarget.style.borderColor = '#2A2A3A')}>
-                      <div className="h-48 overflow-hidden" style={{ backgroundColor: '#1A1A2A' }}>
+                      <div style={{ backgroundColor: '#1A1A2A', aspectRatio: '4/3', overflow: 'hidden' }}>
                         {item.photos && item.photos.length > 0 ? (
                           <img src={item.photos[0]} alt={item.title} className="w-full h-full object-cover" />
                         ) : (
