@@ -179,7 +179,7 @@ export default function LandingPage() {
           </button>
         </div>
 
-        <div className="float fade-up-4" style={{ position: 'relative', maxWidth: 340, width: '100%' }}>
+        <div className="float fade-up-4" style={{ position: 'relative', maxWidth: 700, width: '100%' }}>
           <div style={{ position: 'absolute', inset: -40, background: 'radial-gradient(ellipse,rgba(247,147,26,0.15) 0%,transparent 70%)', borderRadius: '50%' }} />
           <video
             autoPlay
