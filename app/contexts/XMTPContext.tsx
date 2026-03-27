@@ -91,14 +91,13 @@ export function XMTPProvider({ children }: { children: ReactNode }) {
       if (alreadyRegistered) {
         try {
           client = await Client.build(
-            { identifier: address.toLowerCase(), identifierKind: IdentifierKind.Ethereum },
-            { env: 'production' }
+            { identifier: address.toLowerCase(), identifierKind: IdentifierKind.Ethereum }
           )
         } catch {
-          client = await Client.create(signer, { env: 'production' })
+          client = await Client.create(signer)
         }
       } else {
-        client = await Client.create(signer, { env: 'production' })
+        client = await Client.create(signer)
         localStorage.setItem(key, '1')
       }
       setXmtp(client)
