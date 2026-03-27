@@ -403,7 +403,6 @@ export default function LandingPage() {
           </div>
         </div>
       )}
-    </main>
 
       {/* ── Early Access Code Entry Modal ── */}
       {showCodeEntry && (
