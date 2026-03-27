@@ -25,9 +25,9 @@ export default function Home() {
   useEffect(() => {
     const access = localStorage.getItem('bitrove_access')
     if (access !== 'granted') {
-      window.location.href = '/'
+      window.location.replace('/')
     }
-  }, [])
+  }, [mounted])
 
   const [searchQuery, setSearchQuery] = useState('')
   const { loading: xmtpLoading } = useXMTP()

@@ -178,7 +178,7 @@ export default function ListingPage() {
       </nav>
 
       <div className="px-6 py-4 max-w-6xl mx-auto">
-        <a href="/" className="text-sm" style={{ color: '#8B8B9E' }}>← Back to listings</a>
+        <a href="/browse" className="text-sm" style={{ color: '#8B8B9E' }}>← Back to listings</a>
       </div>
 
       <div className="px-6 pb-16 max-w-6xl mx-auto">
