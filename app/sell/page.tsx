@@ -6,8 +6,8 @@ import { supabase } from '../../lib/supabase'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
+import { CATEGORIES, MAIN_CATEGORIES } from '../../lib/categories'
 
-const categories = ['Electronics', 'Vehicles', 'Fashion', 'Home', 'Sports', 'Collectibles', 'Other']
 const conditions = ['New', 'Like New', 'Good', 'Fair']
 const tokens = ['BTC', 'ETH', 'USDT']
 
@@ -20,6 +20,7 @@ export default function SellPage() {
     title: '',
     description: '',
     category: '',
+    subcategory: '',
     condition: '',
     location: '',
     audPrice: '',
@@ -30,7 +31,7 @@ export default function SellPage() {
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
-  const isStep1Valid = form.title && form.category && form.condition && form.location
+  const isStep1Valid = form.title && form.category && form.subcategory && form.condition && form.location
   const isStep2Valid = form.audPrice && form.token
   const isStep3Valid = form.description
 
@@ -43,6 +44,7 @@ export default function SellPage() {
         title: form.title,
         description: form.description,
         category: form.category,
+        subcategory: form.subcategory,
         condition: form.condition,
         location: form.location,
         aud_price: parseFloat(form.audPrice),
@@ -69,7 +71,7 @@ export default function SellPage() {
         <div className="flex items-center gap-8">
           <a href="/" className="text-xl font-bold" style={{ color: '#F7931A' }}>Bitrove</a>
         </div>
-        <ConnectButton />
+        <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
       </nav>
 
       <div className="max-w-2xl mx-auto px-6 py-12">
@@ -111,11 +113,35 @@ export default function SellPage() {
 
                 <div className="mb-4">
                   <label className="text-xs mb-2 block" style={{ color: '#8B8B9E' }}>Category</label>
-                  <div className="flex gap-2 flex-wrap">
-                    {categories.map(cat => (
-                      <button key={cat} onClick={() => updateForm('category', cat)} className="px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: form.category === cat ? '#F7931A' : '#0A0A0F', border: `1px solid ${form.category === cat ? '#F7931A' : '#2A2A3A'}`, color: form.category === cat ? '#fff' : '#8B8B9E' }}>{cat}</button>
+                  <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    {MAIN_CATEGORIES.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => { updateForm('category', cat); updateForm('subcategory', '') }}
+                        className="px-3 py-2 rounded-lg text-sm whitespace-nowrap flex-shrink-0"
+                        style={{ backgroundColor: form.category === cat ? '#F7931A' : '#0A0A0F', border: `1px solid ${form.category === cat ? '#F7931A' : '#2A2A3A'}`, color: form.category === cat ? '#fff' : '#8B8B9E' }}
+                      >
+                        {cat}
+                      </button>
                     ))}
                   </div>
+                  {form.category && CATEGORIES[form.category] && (
+                    <div className="mt-2">
+                      <label className="text-xs mb-2 block" style={{ color: '#8B8B9E' }}>Sub-category</label>
+                      <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                        {CATEGORIES[form.category].map(sub => (
+                          <button
+                            key={sub}
+                            onClick={() => updateForm('subcategory', sub)}
+                            className="px-3 py-2 rounded-lg text-sm whitespace-nowrap flex-shrink-0"
+                            style={{ backgroundColor: form.subcategory === sub ? '#00D4AA' : '#0A0A0F', border: `1px solid ${form.subcategory === sub ? '#00D4AA' : '#2A2A3A'}`, color: form.subcategory === sub ? '#fff' : '#8B8B9E' }}
+                          >
+                            {sub}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mb-4">
@@ -183,7 +209,7 @@ export default function SellPage() {
                 <div className="rounded-lg p-4 mb-6" style={{ backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A' }}>
                   <p className="text-xs font-semibold text-white mb-3">Listing Summary</p>
                   <div className="flex justify-between mb-1"><span className="text-xs" style={{ color: '#8B8B9E' }}>Title</span><span className="text-xs text-white">{form.title}</span></div>
-                  <div className="flex justify-between mb-1"><span className="text-xs" style={{ color: '#8B8B9E' }}>Category</span><span className="text-xs text-white">{form.category}</span></div>
+                  <div className="flex justify-between mb-1"><span className="text-xs" style={{ color: '#8B8B9E' }}>Category</span><span className="text-xs text-white">{form.category} → {form.subcategory}</span></div>
                   <div className="flex justify-between mb-1"><span className="text-xs" style={{ color: '#8B8B9E' }}>Condition</span><span className="text-xs text-white">{form.condition}</span></div>
                   <div className="flex justify-between mb-1"><span className="text-xs" style={{ color: '#8B8B9E' }}>Location</span><span className="text-xs text-white">{form.location}</span></div>
                   <div className="flex justify-between mb-1"><span className="text-xs" style={{ color: '#8B8B9E' }}>Price</span><span className="text-xs" style={{ color: '#F7931A' }}>${form.audPrice} AUD in {form.token}</span></div>

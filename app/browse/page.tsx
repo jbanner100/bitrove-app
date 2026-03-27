@@ -5,6 +5,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import XMTPBadge from '../components/XMTPBadge'
 import { useXMTP } from '../contexts/XMTPContext'
 import { useState, useEffect } from 'react'
+import { CATEGORIES, MAIN_CATEGORIES } from '../../lib/categories'
 import { supabase } from '../../lib/supabase'
 
 interface Prices {
@@ -23,7 +24,8 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('')
   const { loading: xmtpLoading } = useXMTP()
   const [activeTab, setActiveTab] = useState('buy')
-  const [activeCategory, setActiveCategory] = useState('All')
+  const [activeCategory, setActiveCategory] = useState("All")
+  const [activeSubCategory, setActiveSubCategory] = useState("")
   const [prices, setPrices] = useState<Prices>({ btc: 0, eth: 0, usdt: 0 })
   const [priceLoading, setPriceLoading] = useState(true)
   const [listings, setListings] = useState<any[]>([])
@@ -61,14 +63,15 @@ export default function Home() {
         .eq('status', 'active')
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false })
-      if (activeCategory !== 'All') query = query.eq('category', activeCategory)
+      if (activeCategory !== "All") query = query.eq("category", activeCategory)
+      if (activeSubCategory) query = query.eq("subcategory", activeSubCategory)
       if (searchQuery) query = query.ilike('title', `%${searchQuery}%`)
       const { data } = await query
       if (data) setListings(data)
       setListingsLoading(false)
     }
     fetchListings()
-  }, [activeCategory, searchQuery])
+  }, [activeCategory, activeSubCategory, searchQuery])
 
   // ── Price helper ────────────────────────────────────────────────
   const getPrice = (audPrice: number, token: string) => {
@@ -140,11 +143,19 @@ export default function Home() {
       <div className="px-6 mb-8">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-white font-semibold mb-4">Browse Categories</h2>
-          <div className="flex gap-3 flex-wrap">
-            {['All', 'Electronics', 'Vehicles', 'Fashion', 'Home', 'Sports', 'Collectibles', 'Other'].map((cat) => (
-              <button key={cat} onClick={() => setActiveCategory(cat)} className="px-4 py-2 rounded-full text-sm font-medium transition-all" style={{ backgroundColor: activeCategory === cat ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeCategory === cat ? '#fff' : '#8B8B9E' }}>{cat}</button>
+          <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+            {['All', ...MAIN_CATEGORIES].map((cat) => (
+              <button key={cat} onClick={() => { setActiveCategory(cat); setActiveSubCategory('') }} className="px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0" style={{ backgroundColor: activeCategory === cat ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeCategory === cat ? '#fff' : '#8B8B9E' }}>{cat}</button>
             ))}
           </div>
+          {activeCategory !== 'All' && CATEGORIES[activeCategory] && (
+            <div className="flex gap-2 overflow-x-auto pb-2 mt-3" style={{ scrollbarWidth: 'none' }}>
+              <button onClick={() => setActiveSubCategory('')} className="px-3 py-1 rounded-full text-xs whitespace-nowrap flex-shrink-0" style={{ backgroundColor: activeSubCategory === '' ? '#00D4AA' : '#13131A', border: '1px solid #2A2A3A', color: activeSubCategory === '' ? '#fff' : '#8B8B9E' }}>All</button>
+              {CATEGORIES[activeCategory].map((sub: string) => (
+                <button key={sub} onClick={() => setActiveSubCategory(sub)} className="px-3 py-1 rounded-full text-xs whitespace-nowrap flex-shrink-0" style={{ backgroundColor: activeSubCategory === sub ? '#00D4AA' : '#13131A', border: '1px solid #2A2A3A', color: activeSubCategory === sub ? '#fff' : '#8B8B9E' }}>{sub}</button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
