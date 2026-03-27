@@ -82,20 +82,6 @@ export default function ListingPage() {
     }
     fetchPrices()
     const interval = setInterval(fetchPrices, 30000)
-  const handleReport = async () => {
-    if (!reportReason) return
-    setReportSubmitting(true)
-    try {
-      await supabase.from('reports').insert([{
-        listing_id: listing.id,
-        reason: reportReason,
-        reporter_address: address || 'anonymous',
-        status: 'pending'
-      }])
-    } catch (e) {}
-    setReportSubmitted(true)
-    setReportSubmitting(false)
-  }
 
   return () => clearInterval(interval)
   }, [])
@@ -192,6 +178,21 @@ export default function ListingPage() {
       setError(e.message || 'Transaction failed — please try again')
       setBuyStep('details')
     }
+  }
+
+  const handleReport = async () => {
+    if (!reportReason) return
+    setReportSubmitting(true)
+    try {
+      await supabase.from('reports').insert([{
+        listing_id: listing.id,
+        reason: reportReason,
+        reporter_address: address || 'anonymous',
+        status: 'pending'
+      }])
+    } catch (e) {}
+    setReportSubmitted(true)
+    setReportSubmitting(false)
   }
 
   return (
