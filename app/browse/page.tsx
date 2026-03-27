@@ -27,7 +27,7 @@ export default function Home() {
     if (access !== 'granted') {
       window.location.replace('/')
     }
-  }, [mounted])
+  }, [])
 
   const [searchQuery, setSearchQuery] = useState('')
   const { loading: xmtpLoading } = useXMTP()
