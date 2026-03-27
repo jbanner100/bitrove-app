@@ -85,7 +85,22 @@ export function XMTPProvider({ children }: { children: ReactNode }) {
           return bytes
         },
       }
-      const client = await Client.create(signer)
+      const key = `xmtp_registered_${address.toLowerCase()}`
+      const alreadyRegistered = localStorage.getItem(key)
+      let client
+      if (alreadyRegistered) {
+        try {
+          client = await Client.build(
+            { identifier: address.toLowerCase(), identifierKind: IdentifierKind.Ethereum },
+            { env: 'production' }
+          )
+        } catch {
+          client = await Client.create(signer, { env: 'production' })
+        }
+      } else {
+        client = await Client.create(signer, { env: 'production' })
+        localStorage.setItem(key, '1')
+      }
       setXmtp(client)
       await computeUnread(client, address.toLowerCase())
       const streamMessages = async () => {
@@ -120,15 +135,7 @@ export function XMTPProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (walletClient && !xmtp) {
-      const key = `xmtp_registered_${walletClient.account.address.toLowerCase()}`
-      const alreadyRegistered = localStorage.getItem(key)
-      if (!alreadyRegistered) {
-        initXMTP().then(() => {
-          localStorage.setItem(key, '1')
-        })
-      } else {
-        initXMTP()
-      }
+      initXMTP().catch(() => {})
     }
   }, [walletClient])
 
