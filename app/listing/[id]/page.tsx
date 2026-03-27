@@ -43,6 +43,10 @@ export default function ListingPage() {
   }, [])
 
   const [listing, setListing] = useState<any>(null)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportReason, setReportReason] = useState('')
+  const [reportSubmitted, setReportSubmitted] = useState(false)
+  const [reportSubmitting, setReportSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
   const [selectedPhoto, setSelectedPhoto] = useState(0)
   const [showBuyModal, setShowBuyModal] = useState(false)
@@ -78,7 +82,22 @@ export default function ListingPage() {
     }
     fetchPrices()
     const interval = setInterval(fetchPrices, 30000)
-    return () => clearInterval(interval)
+    const handleReport = async () => {
+    if (!reportReason) return
+    setReportSubmitting(true)
+    try {
+      await supabase.from('reports').insert([{
+        listing_id: listing.id,
+        reason: reportReason,
+        reporter_address: address || 'anonymous',
+        status: 'pending'
+      }])
+    } catch (e) {}
+    setReportSubmitted(true)
+    setReportSubmitting(false)
+  }
+
+  return () => clearInterval(interval)
   }, [])
 
   if (loading) {
@@ -260,6 +279,65 @@ export default function ListingPage() {
           <p style={{ color: '#8B8B9E' }}>{listing.description}</p>
         </div>
       </div>
+
+      {/* ── Report Button ── */}
+      <div className="text-center mt-2 mb-4">
+        <button
+          onClick={() => setShowReportModal(true)}
+          className="text-xs"
+          style={{ color: '#8B8B9E', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+        >
+          🚩 Report this listing
+        </button>
+      </div>
+
+      {/* ── Report Modal ── */}
+      {showReportModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
+          <div className="rounded-xl p-8 max-w-md w-full mx-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
+            <button onClick={() => { setShowReportModal(false); setReportReason(''); setReportSubmitted(false) }} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: '#8B8B9E', fontSize: 20, cursor: 'pointer' }}>✕</button>
+            {reportSubmitted ? (
+              <div className="text-center py-4">
+                <p className="text-3xl mb-4">✅</p>
+                <h2 className="text-white font-bold mb-2">Report Received</h2>
+                <p className="text-sm" style={{ color: '#8B8B9E' }}>Thank you for helping keep Bitrove safe. We will review this listing shortly.</p>
+                <button onClick={() => { setShowReportModal(false); setReportSubmitted(false) }} className="mt-6 w-full py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>Close</button>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-white font-bold mb-2">Report Listing</h2>
+                <p className="text-sm mb-6" style={{ color: '#8B8B9E' }}>Select a reason for reporting this listing. All reports are reviewed manually.</p>
+                <div className="flex flex-col gap-2 mb-6">
+                  {[
+                    'Offensive or inappropriate content',
+                    'Scam or fraudulent listing',
+                    'Prohibited or illegal item',
+                    'Counterfeit or fake goods',
+                    'Misleading photos or description',
+                    'Spam or duplicate listing',
+                    'Other',
+                  ].map(reason => (
+                    <button
+                      key={reason}
+                      onClick={() => setReportReason(reason)}
+                      className="text-left px-4 py-3 rounded-lg text-sm"
+                      style={{ backgroundColor: reportReason === reason ? '#F7931A22' : '#0A0A0F', border: `1px solid ${reportReason === reason ? '#F7931A' : '#2A2A3A'}`, color: reportReason === reason ? '#F7931A' : '#8B8B9E' }}
+                    >
+                      {reason}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={() => setShowReportModal(false)} className="flex-1 py-3 rounded-lg font-semibold" style={{ backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A', color: '#8B8B9E' }}>Cancel</button>
+                  <button onClick={handleReport} disabled={!reportReason || reportSubmitting} className="flex-1 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: reportReason ? '#ff4444' : '#2A2A3A' }}>
+                    {reportSubmitting ? 'Submitting...' : 'Submit Report'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {showBuyModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
