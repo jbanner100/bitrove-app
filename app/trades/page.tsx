@@ -158,7 +158,8 @@ export default function TradesPage() {
     <main className="min-h-screen" style={{ backgroundColor: '#0A0A0F' }}>
       <nav className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#2A2A3A' }}>
         <div className="flex items-center gap-8">
-          <a href="/" className="text-xl font-bold" style={{ color: '#F7931A' }}>Bitrove</a>
+          <a href="/browse" className="text-xl font-bold" style={{ color: '#F7931A' }}>Bitrove</a>
+          <a href="/browse" className="text-sm" style={{ color: '#8B8B9E' }}>← Back to listings</a>
         </div>
         <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
       </nav>
@@ -207,7 +208,7 @@ export default function TradesPage() {
                       <p className="text-2xl mb-4">🛒</p>
                       <p className="text-white font-semibold mb-2">No purchases yet</p>
                       <p className="text-sm mb-6" style={{ color: '#8B8B9E' }}>Browse the marketplace and make your first purchase</p>
-                      <button onClick={() => window.location.href = '/'} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>Browse Listings</button>
+                      <button onClick={() => window.location.href = '/browse'} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>Browse Listings</button>
                     </div>
                   ) : buyerTrades.map(trade => <TradeCard key={trade.id} trade={trade} isBuyer={true} />)
                 )}
