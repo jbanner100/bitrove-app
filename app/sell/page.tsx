@@ -71,6 +71,7 @@ export default function SellPage() {
         <div className="flex items-center gap-8">
           <a href="/browse" className="text-xl font-bold" style={{ color: '#F7931A' }}>Bitrove</a>
           <a href="/browse" className="text-sm" style={{ color: '#8B8B9E' }}>← Back to listings</a>
+          <a href="/browse" className="text-sm" style={{ color: '#8B8B9E' }}>← Back to listings</a>
         </div>
         <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
       </nav>
