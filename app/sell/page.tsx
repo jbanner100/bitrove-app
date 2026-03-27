@@ -25,6 +25,9 @@ export default function SellPage() {
     location: '',
     audPrice: '',
     token: '',
+    quantity: '1',
+    deliveryType: 'postage',
+    postageCost: '0',
   })
 
   const updateForm = (field: string, value: string) => {
@@ -51,7 +54,10 @@ export default function SellPage() {
         token: form.token,
         seller_address: address,
         status: 'active',
-        photos: photos
+        photos: photos,
+        quantity: parseInt(form.quantity),
+        delivery_type: form.deliveryType,
+        postage_cost: parseFloat(form.postageCost) || 0
       }])
       .select()
 
@@ -70,7 +76,6 @@ export default function SellPage() {
       <nav className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#2A2A3A' }}>
         <div className="flex items-center gap-8">
           <a href="/browse" className="text-xl font-bold" style={{ color: '#F7931A' }}>Bitrove</a>
-          <a href="/browse" className="text-sm" style={{ color: '#8B8B9E' }}>← Back to listings</a>
           <a href="/browse" className="text-sm" style={{ color: '#8B8B9E' }}>← Back to listings</a>
         </div>
         <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
@@ -158,6 +163,57 @@ export default function SellPage() {
                 <div className="mb-6">
                   <label className="text-xs mb-2 block" style={{ color: '#8B8B9E' }}>Location (suburb/city only)</label>
                   <input type="text" placeholder="e.g. Sydney, NSW" value={form.location} onChange={e => updateForm('location', e.target.value)} className="w-full px-4 py-3 rounded-lg text-white outline-none" style={{ backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A' }} />
+                </div>
+
+                <div className="mb-4">
+                  <label className="text-xs mb-2 block" style={{ color: '#8B8B9E' }}>Quantity Available</label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="1"
+                    value={form.quantity}
+                    onChange={e => updateForm('quantity', e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg text-white outline-none"
+                    style={{ backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A' }}
+                  />
+                </div>
+
+                <div className="mb-6">
+                  <label className="text-xs mb-2 block" style={{ color: '#8B8B9E' }}>Delivery Method</label>
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      onClick={() => updateForm('deliveryType', 'postage')}
+                      className="flex-1 py-3 rounded-lg text-sm font-semibold"
+                      style={{ backgroundColor: form.deliveryType === 'postage' ? '#F7931A' : '#0A0A0F', border: `1px solid ${form.deliveryType === 'postage' ? '#F7931A' : '#2A2A3A'}`, color: form.deliveryType === 'postage' ? '#fff' : '#8B8B9E' }}
+                    >
+                      📦 Postage
+                    </button>
+                    <button
+                      onClick={() => updateForm('deliveryType', 'collection')}
+                      className="flex-1 py-3 rounded-lg text-sm font-semibold"
+                      style={{ backgroundColor: form.deliveryType === 'collection' ? '#F7931A' : '#0A0A0F', border: `1px solid ${form.deliveryType === 'collection' ? '#F7931A' : '#2A2A3A'}`, color: form.deliveryType === 'collection' ? '#fff' : '#8B8B9E' }}
+                    >
+                      🤝 Collection Only
+                    </button>
+                  </div>
+                  {form.deliveryType === 'postage' && (
+                    <div>
+                      <label className="text-xs mb-2 block" style={{ color: '#8B8B9E' }}>Postage Cost (AUD) — enter 0 if included in price</label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white">$</span>
+                        <input
+                          type="number"
+                          min="0"
+                          placeholder="0.00"
+                          value={form.postageCost}
+                          onChange={e => updateForm('postageCost', e.target.value)}
+                          className="flex-1 px-4 py-3 rounded-lg text-white outline-none"
+                          style={{ backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A' }}
+                        />
+                        <span style={{ color: '#8B8B9E' }}>AUD</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <button onClick={() => setStep(2)} disabled={!isStep1Valid} className="w-full py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: isStep1Valid ? '#F7931A' : '#2A2A3A' }}>Next — Set Price</button>

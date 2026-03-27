@@ -120,7 +120,7 @@ export default function ListingPage() {
       setError('Please connect your wallet first')
       return
     }
-    if (!deliveryAddress.trim()) {
+    if (!deliveryAddress.trim() && listing.delivery_type !== 'collection') {
       setError('Please enter your delivery address')
       return
     }
@@ -166,9 +166,10 @@ export default function ListingPage() {
         status: 'funded',
       }])
 
+      const newQuantity = (listing.quantity || 1) - 1
       await supabase
         .from('listings')
-        .update({ status: 'sold' })
+        .update(newQuantity <= 0 ? { status: 'sold', quantity: 0 } : { quantity: newQuantity })
         .eq('id', listing.id)
 
       setBuyStep('complete')
@@ -403,7 +404,7 @@ export default function ListingPage() {
                   </button>
                   <button
                     onClick={handleBuy}
-                    disabled={buyStep !== 'details' || !deliveryAddress.trim()}
+                    disabled={buyStep !== 'details' || (listing.delivery_type !== 'collection' && !deliveryAddress.trim())}
                     className="flex-1 py-3 rounded-lg font-semibold text-white"
                     style={{ backgroundColor: buyStep === 'details' ? '#F7931A' : '#2A2A3A' }}
                   >
