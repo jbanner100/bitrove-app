@@ -214,7 +214,7 @@ export default function ListingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
           <div>
-            <div className="w-full h-80 rounded-xl overflow-hidden flex items-center justify-center mb-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
+            <div className="w-full rounded-xl overflow-hidden flex items-center justify-center mb-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', aspectRatio: '1/1' }}>
               {listing.photos && listing.photos.length > 0 ? (
                 <img src={listing.photos[selectedPhoto]} alt={listing.title} className="w-full h-full object-cover" />
               ) : (
