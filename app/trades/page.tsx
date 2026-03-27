@@ -22,6 +22,14 @@ const tokenConfig: Record<string, { symbol: string, color: string }> = {
 }
 
 export default function TradesPage() {
+  // Early access guard
+  useEffect(() => {
+    const access = localStorage.getItem('bitrove_access')
+    if (access !== 'granted') {
+      window.location.href = '/'
+    }
+  }, [])
+
   const { address, isConnected } = useAccount()
   const { xmtp } = useXMTP()
   const [buyerTrades, setBuyerTrades] = useState<any[]>([])

@@ -34,6 +34,14 @@ export default function ListingPage() {
   const params = useParams()
   const { address, isConnected } = useAccount()
   const [prices, setPrices] = useState<Prices>({ btc: 0, eth: 0, usdt: 0 })
+  // Early access guard
+  useEffect(() => {
+    const access = localStorage.getItem('bitrove_access')
+    if (access !== 'granted') {
+      window.location.href = '/'
+    }
+  }, [])
+
   const [listing, setListing] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [selectedPhoto, setSelectedPhoto] = useState(0)
