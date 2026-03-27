@@ -150,20 +150,89 @@ export default function Home() {
       {/* ── Categories ── */}
       <div className="px-6 mb-8">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-white font-semibold mb-4">Browse Categories</h2>
-          <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-            {['All', ...MAIN_CATEGORIES].map((cat) => (
-              <button key={cat} onClick={() => { setActiveCategory(cat); setActiveSubCategory('') }} className="px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0" style={{ backgroundColor: activeCategory === cat ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeCategory === cat ? '#fff' : '#8B8B9E' }}>{cat}</button>
-            ))}
-          </div>
-          {activeCategory !== 'All' && CATEGORIES[activeCategory] && (
-            <div className="flex gap-2 overflow-x-auto pb-2 mt-3" style={{ scrollbarWidth: 'none' }}>
-              <button onClick={() => setActiveSubCategory('')} className="px-3 py-1 rounded-full text-xs whitespace-nowrap flex-shrink-0" style={{ backgroundColor: activeSubCategory === '' ? '#00D4AA' : '#13131A', border: '1px solid #2A2A3A', color: activeSubCategory === '' ? '#fff' : '#8B8B9E' }}>All</button>
-              {CATEGORIES[activeCategory].map((sub: string) => (
-                <button key={sub} onClick={() => setActiveSubCategory(sub)} className="px-3 py-1 rounded-full text-xs whitespace-nowrap flex-shrink-0" style={{ backgroundColor: activeSubCategory === sub ? '#00D4AA' : '#13131A', border: '1px solid #2A2A3A', color: activeSubCategory === sub ? '#fff' : '#8B8B9E' }}>{sub}</button>
-              ))}
-            </div>
-          )}
+          <p className="text-xs font-semibold mb-4 uppercase tracking-widest" style={{ color: '#8B8B9E' }}>Browse Categories</p>
+
+          <style>{`
+            .cat-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+            @media (max-width: 768px) { .cat-grid { grid-template-columns: repeat(4, 1fr); } }
+            @media (max-width: 480px) { .cat-grid { grid-template-columns: repeat(3, 1fr); } }
+            .cat-card {
+              background: #13131A; border: 1px solid #2A2A3A; border-radius: 16px;
+              padding: 16px 8px 12px; display: flex; flex-direction: column;
+              align-items: center; gap: 8px; cursor: pointer; position: relative; overflow: hidden;
+              transition: border-color 0.2s, transform 0.2s, background 0.2s;
+            }
+            .cat-card:hover { border-color: #F7931A; transform: translateY(-2px); background: #1A1A24; }
+            .cat-card.cat-active { border-color: #F7931A; background: rgba(247,147,26,0.08); }
+            .cat-glow {
+              position: absolute; inset: 0;
+              background: radial-gradient(ellipse at 50% 0%, rgba(247,147,26,0.15) 0%, transparent 70%);
+              opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            }
+            .cat-card.cat-active .cat-glow { opacity: 1; }
+            .cat-icon { font-size: 26px; line-height: 1; transition: transform 0.3s; }
+            .cat-card:hover .cat-icon { transform: scale(1.18) rotate(-4deg); }
+            .cat-card.cat-active .cat-icon { transform: scale(1.12); }
+            .cat-label { font-size: 10px; font-weight: 600; letter-spacing: 0.02em; color: #8B8B9E; text-align: center; line-height: 1.2; transition: color 0.2s; }
+            .cat-card:hover .cat-label, .cat-card.cat-active .cat-label { color: #F7931A; }
+            .sub-pill {
+              background: #0A0A0F; border: 1px solid #2A2A3A; border-radius: 20px;
+              padding: 5px 14px; font-size: 11px; color: #8B8B9E; cursor: pointer;
+              transition: all 0.15s; white-space: nowrap;
+            }
+            .sub-pill:hover { border-color: #00D4AA; color: #00D4AA; }
+            .sub-pill.sub-active { border-color: #00D4AA; color: #00D4AA; background: rgba(0,212,170,0.08); }
+          `}</style>
+
+          {(() => {
+            const categoryIcons: Record<string, string> = {
+              'All': '🔥',
+              'Electronics': '💻',
+              'Vehicles': '🚗',
+              'Boats & Marine': '⛵',
+              'Fashion': '👗',
+              'Home & Garden': '🏡',
+              'Sports & Outdoors': '🏄',
+              'Gaming': '🎮',
+              'Music': '🎸',
+              'Collectibles': '🏆',
+              'Tools & Equipment': '🔧',
+              'Other': '📦',
+            }
+            const allCats = ['All', ...MAIN_CATEGORIES]
+            return (
+              <>
+                <div className="cat-grid mb-4">
+                  {allCats.map(cat => (
+                    <div
+                      key={cat}
+                      className={`cat-card ${activeCategory === cat ? 'cat-active' : ''}`}
+                      onClick={() => { setActiveCategory(cat); setActiveSubCategory('') }}
+                    >
+                      <div className="cat-glow" />
+                      <span className="cat-icon">{categoryIcons[cat] || '📦'}</span>
+                      <span className="cat-label">{cat}</span>
+                    </div>
+                  ))}
+                </div>
+                {activeCategory !== 'All' && CATEGORIES[activeCategory] && (
+                  <div className="flex gap-2 flex-wrap">
+                    <div
+                      className={`sub-pill ${activeSubCategory === '' ? 'sub-active' : ''}`}
+                      onClick={() => setActiveSubCategory('')}
+                    >All</div>
+                    {CATEGORIES[activeCategory].map((sub: string) => (
+                      <div
+                        key={sub}
+                        className={`sub-pill ${activeSubCategory === sub ? 'sub-active' : ''}`}
+                        onClick={() => setActiveSubCategory(sub)}
+                      >{sub}</div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )
+          })()}
         </div>
       </div>
 
