@@ -94,7 +94,10 @@ export function XMTPProvider({ children }: { children: ReactNode }) {
             { identifier: address.toLowerCase(), identifierKind: IdentifierKind.Ethereum }
           )
         } catch {
+          // Client.build failed — clear flag and do fresh create with signature
+          localStorage.removeItem(key)
           client = await Client.create(signer)
+          localStorage.setItem(key, '1')
         }
       } else {
         client = await Client.create(signer)
