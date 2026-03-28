@@ -6,7 +6,7 @@ import '@rainbow-me/rainbowkit/styles.css'
 import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { XMTPProvider } from './contexts/XMTPContext'
+import { XMTPProvider, useXMTP } from './contexts/XMTPContext'
 import { Analytics } from '@vercel/analytics/react'
 import { http, fallback } from 'wagmi'
 
@@ -29,6 +29,24 @@ const config = getDefaultConfig({
 
 const queryClient = new QueryClient()
 
+function XMTPConnector({ children }: { children: React.ReactNode }) {
+  const { initXMTP } = useXMTP()
+
+  const handleConnect = () => {
+    const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent)
+    const delay = isMobile ? 2000 : 500
+    setTimeout(() => {
+      initXMTP().catch(() => {})
+    }, delay)
+  }
+
+  return (
+    <RainbowKitProvider modalSize="compact" onConnect={handleConnect}>
+      {children}
+    </RainbowKitProvider>
+  )
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -45,12 +63,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <WagmiProvider config={config}>
           <QueryClientProvider client={queryClient}>
-            <RainbowKitProvider modalSize="compact">
-              <XMTPProvider>
+            <XMTPProvider>
+              <XMTPConnector>
                 {children}
-              </XMTPProvider>
-              <Analytics />
-            </RainbowKitProvider>
+                <Analytics />
+              </XMTPConnector>
+            </XMTPProvider>
           </QueryClientProvider>
         </WagmiProvider>
       </body>

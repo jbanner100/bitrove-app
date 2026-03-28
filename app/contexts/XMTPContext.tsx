@@ -135,11 +135,7 @@ export function XMTPProvider({ children }: { children: ReactNode }) {
     await computeUnread(xmtp, walletClient.account.address.toLowerCase())
   }, [xmtp, walletClient, computeUnread])
 
-  useEffect(() => {
-    if (walletClient && !xmtp) {
-      initXMTP().catch(() => {})
-    }
-  }, [walletClient])
+  // XMTP is now initiated via RainbowKit onConnect in layout.tsx
 
   useEffect(() => {
     if (!walletClient) {
