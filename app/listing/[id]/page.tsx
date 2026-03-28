@@ -254,6 +254,7 @@ export default function ListingPage() {
               recipientAddress={listing.seller_address}
               recipientLabel={`Seller ${listing.seller_address.slice(0, 6)}...${listing.seller_address.slice(-4)}`}
               listingTitle={listing.title}
+              listingId={listing.id}
             />
 
             <button

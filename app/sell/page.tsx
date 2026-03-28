@@ -66,7 +66,7 @@ export default function SellPage() {
       alert('Error creating listing: ' + error.message)
     } else {
       alert('Listing published successfully!')
-      window.location.href = '/'
+      window.location.href = '/browse'
     }
   }
 

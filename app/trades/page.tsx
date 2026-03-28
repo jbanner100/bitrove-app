@@ -32,6 +32,7 @@ export default function TradesPage() {
   const { address, isConnected } = useAccount()
   const [buyerTrades, setBuyerTrades] = useState<any[]>([])
   const [sellerTrades, setSellerTrades] = useState<any[]>([])
+  const [sellerListings, setSellerListings] = useState<any[]>([])
   const [conversations, setConversations] = useState<any[]>([])
   const [loadingChats, setLoadingChats] = useState(false)
   const [selectedConvo, setSelectedConvo] = useState<any>(null)
@@ -57,8 +58,15 @@ export default function TradesPage() {
         .select('*, listings(*)')
         .eq('seller_address', address)
         .order('created_at', { ascending: false })
+      const { data: listings } = await supabase
+        .from('listings')
+        .select('*')
+        .eq('seller_address', address)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
       if (buying) setBuyerTrades(buying)
       if (selling) setSellerTrades(selling)
+      if (listings) setSellerListings(listings)
       setLoading(false)
     }
     fetchTrades()
@@ -147,6 +155,7 @@ export default function TradesPage() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-white font-semibold mb-1">💬 {convo.partnerAddress.slice(0, 6)}...{convo.partnerAddress.slice(-4)}</p>
+            {convo.listingTitle && <p className="text-xs font-semibold mb-1" style={{ color: '#F7931A' }}>Re: {convo.listingTitle}</p>}
             <p className="text-xs mb-1" style={{ color: '#8B8B9E' }}>{convo.lastMessage?.slice(0, 50)}{convo.lastMessage?.length > 50 ? '...' : ''}</p>
             <p className="text-xs" style={{ color: '#8B8B9E' }}>{new Date(convo.lastTime).toLocaleDateString('en-AU')}</p>
           </div>
@@ -200,7 +209,7 @@ export default function TradesPage() {
                 className="px-6 py-2 rounded-lg font-medium transition-all"
                 style={{ backgroundColor: activeTab === 'selling' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'selling' ? '#fff' : '#8B8B9E' }}
               >
-                📦 Selling ({sellerTrades.length})
+                📦 Selling ({sellerListings.length + sellerTrades.length})
               </button>
               <button
                 onClick={() => setActiveTab('chats')}
@@ -227,14 +236,56 @@ export default function TradesPage() {
                 )}
 
                 {activeTab === 'selling' && (
-                  sellerTrades.length === 0 ? (
+                  sellerListings.length === 0 && sellerTrades.length === 0 ? (
                     <div className="text-center py-16">
                       <p className="text-2xl mb-4">📦</p>
-                      <p className="text-white font-semibold mb-2">No sales yet</p>
+                      <p className="text-white font-semibold mb-2">No listings yet</p>
                       <p className="text-sm mb-6" style={{ color: '#8B8B9E' }}>List an item to start selling</p>
                       <button onClick={() => window.location.href = '/sell'} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>List an Item</button>
                     </div>
-                  ) : sellerTrades.map(trade => <TradeCard key={trade.id} trade={trade} isBuyer={false} />)
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      {sellerListings.length > 0 && (
+                        <>
+                          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#8B8B9E' }}>Active Listings</p>
+                          {sellerListings.map(listing => (
+                            <div key={listing.id} className="rounded-xl p-6" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
+                              <div className="flex items-start justify-between mb-4">
+                                <div>
+                                  <h3 className="text-white font-semibold mb-1">{listing.title}</h3>
+                                  <p className="text-xs" style={{ color: '#8B8B9E' }}>📍 {listing.location}</p>
+                                </div>
+                                <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#00D4AA22', border: '1px solid #00D4AA', color: '#00D4AA' }}>
+                                  FOR SALE
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between mb-4">
+                                <div>
+                                  <p className="text-xs mb-1" style={{ color: '#8B8B9E' }}>Price</p>
+                                  <p className="font-bold" style={{ color: '#F7931A' }}>${listing.aud_price?.toLocaleString()} AUD</p>
+                                  <p className="text-xs" style={{ color: '#8B8B9E' }}>Qty: {listing.quantity || 1}</p>
+                                </div>
+                                <p className="text-xs" style={{ color: '#8B8B9E' }}>{new Date(listing.created_at).toLocaleDateString('en-AU')}</p>
+                              </div>
+                              <button
+                                onClick={() => window.location.href = `/listing/${listing.id}`}
+                                className="w-full py-2 rounded-lg text-sm font-semibold text-white"
+                                style={{ backgroundColor: '#F7931A' }}
+                              >
+                                View Listing
+                              </button>
+                            </div>
+                          ))}
+                        </>
+                      )}
+                      {sellerTrades.length > 0 && (
+                        <>
+                          <p className="text-xs font-semibold uppercase tracking-widest mt-4" style={{ color: '#8B8B9E' }}>Trades</p>
+                          {sellerTrades.map(trade => <TradeCard key={trade.id} trade={trade} isBuyer={false} />)}
+                        </>
+                      )}
+                    </div>
+                  )
                 )}
 
                 {activeTab === 'chats' && (
@@ -260,6 +311,8 @@ export default function TradesPage() {
                           <XMTPChat
                             recipientAddress={selectedConvo.partnerAddress}
                             recipientLabel={`${selectedConvo.partnerAddress.slice(0, 6)}...${selectedConvo.partnerAddress.slice(-4)}`}
+                            listingTitle={selectedConvo.listingTitle}
+                            listingId={selectedConvo.listingId}
                             showDeleteButton={true}
                           />
                         </div>

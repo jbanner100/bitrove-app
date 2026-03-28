@@ -10,6 +10,7 @@ interface ChatProps {
   recipientAddress?: string
   recipientLabel?: string
   listingTitle?: string
+  listingId?: string
   showDeleteButton?: boolean
   existingConversation?: any
 }
@@ -21,7 +22,7 @@ interface Message {
   created_at: string
 }
 
-export default function BitroveChat({ recipientAddress, recipientLabel, listingTitle, showDeleteButton }: ChatProps) {
+export default function BitroveChat({ recipientAddress, recipientLabel, listingTitle, listingId, showDeleteButton }: ChatProps) {
   const { address, isConnected } = useAccount()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
@@ -44,11 +45,12 @@ export default function BitroveChat({ recipientAddress, recipientLabel, listingT
 
   const loadMessages = async () => {
     if (!address || !recipientAddress) return
-    const { data } = await supabase
+    let query = supabase
       .from('messages')
       .select('*')
       .or(`and(sender_address.eq.${address.toLowerCase()},recipient_address.eq.${recipientAddress.toLowerCase()}),and(sender_address.eq.${recipientAddress.toLowerCase()},recipient_address.eq.${address.toLowerCase()})`)
-      .order('created_at', { ascending: true })
+    if (listingId) query = query.eq('listing_id', listingId)
+    const { data } = await query.order('created_at', { ascending: true })
     if (data) setMessages(data)
 
     // Mark messages as read
@@ -78,6 +80,7 @@ export default function BitroveChat({ recipientAddress, recipientLabel, listingT
       sender_address: address.toLowerCase(),
       recipient_address: recipientAddress.toLowerCase(),
       content,
+      listing_id: listingId || null,
       read: false,
     }])
     await loadMessages()
