@@ -88,20 +88,36 @@ export default function TradesPage() {
         .or(`sender_address.eq.${address.toLowerCase()},recipient_address.eq.${address.toLowerCase()}`)
         .order('created_at', { ascending: false })
       
-      // Group by conversation partner
+      // Group by conversation partner + listing
       const convMap: Record<string, any> = {}
       if (data) {
         data.forEach(msg => {
-          const partner = msg.sender_address === address.toLowerCase() 
-            ? msg.recipient_address 
+          const partner = msg.sender_address === address.toLowerCase()
+            ? msg.recipient_address
             : msg.sender_address
-          if (!convMap[partner]) {
-            convMap[partner] = { partnerAddress: partner, lastMessage: msg.content, lastTime: msg.created_at, unread: 0 }
+          const key = `${partner}_${msg.listing_id || 'general'}`
+          if (!convMap[key]) {
+            convMap[key] = { partnerAddress: partner, listingId: msg.listing_id, listingTitle: null, listingPhoto: null, lastMessage: msg.content, lastTime: msg.created_at, unread: 0 }
           }
           if (msg.recipient_address === address.toLowerCase() && !msg.read) {
-            convMap[partner].unread++
+            convMap[key].unread++
           }
         })
+      }
+      // Fetch listing titles and photos
+      const listingIds = [...new Set(Object.values(convMap).map((c: any) => c.listingId).filter(Boolean))]
+      if (listingIds.length > 0) {
+        const { data: listings } = await supabase.from('listings').select('id, title, photos').in('id', listingIds)
+        if (listings) {
+          listings.forEach((l: any) => {
+            Object.values(convMap).forEach((c: any) => {
+              if (c.listingId === l.id) {
+                c.listingTitle = l.title
+                c.listingPhoto = l.photos?.[0] || null
+              }
+            })
+          })
+        }
       }
       setConversations(Object.values(convMap))
     } catch (e) {
