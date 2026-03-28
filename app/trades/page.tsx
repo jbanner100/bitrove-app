@@ -148,27 +148,34 @@ export default function TradesPage() {
   const ConvoCard = ({ convo }: { convo: any }) => {
     return (
       <div
-        className="rounded-xl p-6 cursor-pointer"
+        className="rounded-xl p-4 cursor-pointer flex gap-4 items-center"
         style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}
         onClick={() => setSelectedConvo(convo)}
       >
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-white font-semibold mb-1">💬 {convo.partnerAddress.slice(0, 6)}...{convo.partnerAddress.slice(-4)}</p>
-            {convo.listingTitle && <p className="text-xs font-semibold mb-1" style={{ color: '#F7931A' }}>Re: {convo.listingTitle}</p>}
-            <p className="text-xs mb-1" style={{ color: '#8B8B9E' }}>{convo.lastMessage?.slice(0, 50)}{convo.lastMessage?.length > 50 ? '...' : ''}</p>
-            <p className="text-xs" style={{ color: '#8B8B9E' }}>{new Date(convo.lastTime).toLocaleDateString('en-AU')}</p>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            {convo.unread > 0 && (
-              <span className="text-xs px-2 py-1 rounded-full font-bold" style={{ backgroundColor: '#F7931A', color: '#fff' }}>
-                {convo.unread}
-              </span>
-            )}
-            <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: '#F7931A22', border: '1px solid #F7931A', color: '#F7931A' }}>
-              🔒 Secure
+        {/* Listing photo thumbnail */}
+        <div className="flex-shrink-0 rounded-xl overflow-hidden" style={{ width: 64, height: 64, backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A' }}>
+          {convo.listingPhoto ? (
+            <img src={convo.listingPhoto} alt={convo.listingTitle} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center" style={{ fontSize: 28 }}>📦</div>
+          )}
+        </div>
+
+        {/* Chat info */}
+        <div className="flex-1 min-w-0">
+          {convo.listingTitle && <p className="text-white font-semibold text-sm mb-1 truncate">{convo.listingTitle}</p>}
+          <p className="text-xs mb-1 truncate" style={{ color: '#8B8B9E' }}>{convo.lastMessage?.slice(0, 60)}{convo.lastMessage?.length > 60 ? '...' : ''}</p>
+          <p className="text-xs" style={{ color: '#8B8B9E' }}>With: {convo.partnerAddress.slice(0, 6)}...{convo.partnerAddress.slice(-4)}</p>
+        </div>
+
+        {/* Unread badge */}
+        <div className="flex flex-col items-end gap-2 flex-shrink-0">
+          {convo.unread > 0 && (
+            <span className="text-xs px-2 py-1 rounded-full font-bold" style={{ backgroundColor: '#F7931A', color: '#fff' }}>
+              {convo.unread}
             </span>
-          </div>
+          )}
+          <span style={{ color: '#8B8B9E', fontSize: 18 }}>›</span>
         </div>
       </div>
     )
