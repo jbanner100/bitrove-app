@@ -5,7 +5,6 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { supabase } from '../../lib/supabase'
-import { useXMTP } from '../../app/contexts/XMTPContext'
 import XMTPChat from '../../app/components/XMTPChat'
 
 const statusConfig: Record<string, { label: string, color: string }> = {
@@ -31,11 +30,11 @@ export default function TradesPage() {
   }, [])
 
   const { address, isConnected } = useAccount()
-  const { xmtp } = useXMTP()
   const [buyerTrades, setBuyerTrades] = useState<any[]>([])
   const [sellerTrades, setSellerTrades] = useState<any[]>([])
   const [conversations, setConversations] = useState<any[]>([])
   const [loadingChats, setLoadingChats] = useState(false)
+  const [selectedConvo, setSelectedConvo] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'buying' | 'selling' | 'chats'>('buying')
   const [mounted, setMounted] = useState(false)
@@ -67,18 +66,37 @@ export default function TradesPage() {
   }, [address])
 
   useEffect(() => {
-    if (activeTab === 'chats' && xmtp) {
+    if (activeTab === 'chats' && address) {
       loadConversations()
     }
-  }, [activeTab, xmtp])
+  }, [activeTab, address])
 
   const loadConversations = async () => {
-    if (!xmtp) return
+    if (!address) return
     setLoadingChats(true)
     try {
-      await xmtp.conversations.sync()
-      const convos = await xmtp.conversations.list()
-      setConversations(convos)
+      const { data } = await supabase
+        .from('messages')
+        .select('*')
+        .or(`sender_address.eq.${address.toLowerCase()},recipient_address.eq.${address.toLowerCase()}`)
+        .order('created_at', { ascending: false })
+      
+      // Group by conversation partner
+      const convMap: Record<string, any> = {}
+      if (data) {
+        data.forEach(msg => {
+          const partner = msg.sender_address === address.toLowerCase() 
+            ? msg.recipient_address 
+            : msg.sender_address
+          if (!convMap[partner]) {
+            convMap[partner] = { partnerAddress: partner, lastMessage: msg.content, lastTime: msg.created_at, unread: 0 }
+          }
+          if (msg.recipient_address === address.toLowerCase() && !msg.read) {
+            convMap[partner].unread++
+          }
+        })
+      }
+      setConversations(Object.values(convMap))
     } catch (e) {
       console.error('Failed to load conversations:', e)
     }
@@ -121,18 +139,6 @@ export default function TradesPage() {
   }
 
   const ConvoCard = ({ convo }: { convo: any }) => {
-    const [peerAddress, setPeerAddress] = useState('')
-
-    useEffect(() => {
-      const getPeer = async () => {
-        try {
-          const peerId = await convo.peerInboxId()
-          setPeerAddress(peerId?.slice(0, 6) + '...' + peerId?.slice(-4))
-        } catch {}
-      }
-      getPeer()
-    }, [convo])
-
     return (
       <div
         className="rounded-xl p-6 cursor-pointer"
@@ -141,12 +147,20 @@ export default function TradesPage() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-white font-semibold mb-1">💬 Conversation</p>
-            <p className="text-xs" style={{ color: '#8B8B9E' }}>With: {peerAddress || 'Loading...'}</p>
+            <p className="text-white font-semibold mb-1">💬 {convo.partnerAddress.slice(0, 6)}...{convo.partnerAddress.slice(-4)}</p>
+            <p className="text-xs mb-1" style={{ color: '#8B8B9E' }}>{convo.lastMessage?.slice(0, 50)}{convo.lastMessage?.length > 50 ? '...' : ''}</p>
+            <p className="text-xs" style={{ color: '#8B8B9E' }}>{new Date(convo.lastTime).toLocaleDateString('en-AU')}</p>
           </div>
-          <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#00D4AA22', border: '1px solid #00D4AA', color: '#00D4AA' }}>
-            🔒 Encrypted
-          </span>
+          <div className="flex flex-col items-end gap-2">
+            {convo.unread > 0 && (
+              <span className="text-xs px-2 py-1 rounded-full font-bold" style={{ backgroundColor: '#F7931A', color: '#fff' }}>
+                {convo.unread}
+              </span>
+            )}
+            <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: '#F7931A22', border: '1px solid #F7931A', color: '#F7931A' }}>
+              🔒 Secure
+            </span>
+          </div>
         </div>
       </div>
     )
@@ -227,12 +241,6 @@ export default function TradesPage() {
                 {activeTab === 'chats' && (
                   loadingChats ? (
                     <div className="text-center py-16"><p style={{ color: '#8B8B9E' }}>Loading chats...</p></div>
-                  ) : !xmtp ? (
-                    <div className="text-center py-16">
-                      <p className="text-2xl mb-4">💬</p>
-                      <p className="text-white font-semibold mb-2">Setting up encrypted chat...</p>
-                      <p className="text-sm" style={{ color: '#8B8B9E' }}>Check MetaMask for a signature request</p>
-                    </div>
                   ) : conversations.length === 0 ? (
                     <div className="text-center py-16">
                       <p className="text-2xl mb-4">💬</p>
@@ -251,9 +259,9 @@ export default function TradesPage() {
                             ← Back to chats
                           </button>
                           <XMTPChat
-                            recipientAddress={address || ''}
+                            recipientAddress={selectedConvo.partnerAddress}
+                            recipientLabel={`${selectedConvo.partnerAddress.slice(0, 6)}...${selectedConvo.partnerAddress.slice(-4)}`}
                             showDeleteButton={true}
-                            existingConversation={selectedConvo}
                           />
                         </div>
                       ) : (
