@@ -38,7 +38,6 @@ export default function TradesPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'buying' | 'selling' | 'chats'>('buying')
   const [mounted, setMounted] = useState(false)
-  const [selectedConvo, setSelectedConvo] = useState<any>(null)
 
   useEffect(() => {
     setMounted(true)
