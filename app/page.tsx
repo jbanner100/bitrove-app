@@ -179,6 +179,8 @@ export default function LandingPage() {
         input[type="email"]:focus{border-color:#F7931A}
         input[type="email"]::placeholder{color:#4A4A5A}
         @media(min-width:769px){.nav-desktop{display:flex !important}.hamburger{display:none !important}}
+        @media(min-width:769px){.nav-desktop{display:flex !important}.hamburger{display:none !important}}
+        @media(max-width:768px){.nav-desktop{display:none !important}.hamburger{display:flex !important;flex-direction:column;background:transparent;border:none;cursor:pointer;padding:4px}}
         @media(max-width:768px){.nav-desktop{display:none !important}.hamburger{display:flex !important;flex-direction:column;background:transparent;border:none;cursor:pointer;padding:4px}}
         @media(max-width:768px){
           .steps-grid{grid-template-columns:1fr !important}
