@@ -178,11 +178,12 @@ export default function LandingPage() {
         input[type="email"]{background:#13131A;border:1px solid #2A2A3A;color:#fff;outline:none;transition:border-color 0.2s;font-family:inherit}
         input[type="email"]:focus{border-color:#F7931A}
         input[type="email"]::placeholder{color:#4A4A5A}
+        @media(min-width:769px){.nav-desktop{display:flex !important}.hamburger{display:none !important}}
+        @media(max-width:768px){.nav-desktop{display:none !important}.hamburger{display:flex !important;flex-direction:column;background:transparent;border:none;cursor:pointer;padding:4px}}
         @media(max-width:768px){
           .steps-grid{grid-template-columns:1fr !important}
           .pillars-grid{grid-template-columns:1fr 1fr !important}
           .hero-title{font-size:2.5rem !important}
-          @media(min-width:769px){.nav-desktop{display:flex !important}.hamburger{display:none !important}}@media(max-width:768px){.nav-desktop{display:none !important}.hamburger{display:flex !important;flex-direction:column;background:transparent;border:none;cursor:pointer;padding:4px}}
           .stats-grid{grid-template-columns:1fr !important}
         }
       `}</style>
