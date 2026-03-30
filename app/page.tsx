@@ -11,6 +11,8 @@ export default function LandingPage() {
   const [submitting, setSubmitting] = useState(false)
   const [activeCard, setActiveCard] = useState<number | null>(null)
   const [scrollY, setScrollY] = useState(0)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [modalEmail, setModalEmail] = useState('')
   const [modalSubmitted, setModalSubmitted] = useState(false)
@@ -182,6 +184,7 @@ export default function LandingPage() {
           .pillars-grid{grid-template-columns:1fr 1fr !important}
           .hero-title{font-size:2.5rem !important}
           .nav-desktop{display:none !important}
+        .hamburger{display:flex !important;flex-direction:column;background:transparent;border:none;cursor:pointer;padding:4px}
           .stats-grid{grid-template-columns:1fr !important}
         }
       `}</style>
@@ -208,7 +211,22 @@ export default function LandingPage() {
             Enter Marketplace →
           </button>
         </div>
+        <button onClick={() => setMenuOpen(!menuOpen)} className="hamburger">
+          <div style={{ width: 22, height: 2, background: '#fff', marginBottom: 5 }} />
+          <div style={{ width: 22, height: 2, background: '#fff', marginBottom: 5 }} />
+          <div style={{ width: 22, height: 2, background: '#fff' }} />
+        </button>
       </nav>
+      {menuOpen && (
+        <div style={{ position: 'fixed', top: 60, left: 0, right: 0, zIndex: 99, background: 'rgba(10,10,15,0.97)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #1A1A2A', padding: '24px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <a href="/how-it-works" onClick={() => setMenuOpen(false)} style={{ color: '#8B8B9E', fontSize: 16, fontWeight: 500, textDecoration: 'none' }}>How it Works</a>
+          <span onClick={() => { scrollTo('why-bitrove'); setMenuOpen(false) }} style={{ color: '#8B8B9E', fontSize: 16, fontWeight: 500, cursor: 'pointer' }}>Why Bitrove</span>
+          <span onClick={() => { scrollTo('waitlist'); setMenuOpen(false) }} style={{ color: '#8B8B9E', fontSize: 16, fontWeight: 500, cursor: 'pointer' }}>Join Waitlist</span>
+          <button onClick={handleMarketplaceClick} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '10px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
+            Enter Marketplace →
+          </button>
+        </div>
+      )}
 
       {/* ── Hero ── */}
       <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '120px 24px 80px', position: 'relative', textAlign: 'center' }}>
