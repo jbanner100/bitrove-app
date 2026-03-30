@@ -201,7 +201,7 @@ export default function LandingPage() {
           <span style={{ fontSize: 10, color: '#F7931A', opacity: 0.7 }}>®</span>
         </div>
         <div className="nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-          <span className="nav-link" onClick={() => scrollTo('how-it-works')}>How it Works</span>
+          <a className="nav-link" href="/how-it-works" style={{ textDecoration: 'none' }}>How it Works</a>
           <span className="nav-link" onClick={() => scrollTo('why-bitrove')}>Why Bitrove</span>
           <span className="nav-link" onClick={() => scrollTo('waitlist')}>Join Waitlist</span>
           <button onClick={handleMarketplaceClick} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '8px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, transition: 'all 0.2s', background: 'transparent', cursor: 'pointer' }}>
