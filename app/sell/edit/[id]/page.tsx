@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { useParams } from 'next/navigation'
 import { CATEGORIES, MAIN_CATEGORIES } from '../../../../lib/categories'
+import { getSuburbs, searchSuburbs, formatSuburb, type Suburb } from '../../../../lib/suburbs'
 
 const conditions = ['New', 'Like New', 'Good', 'Fair']
 const tokens = ['USDT', 'WETH', 'WBTC']
@@ -31,6 +32,31 @@ export default function EditListingPage() {
     deliveryType: 'postage',
     postageCost: '0',
   })
+
+  const [suburbs, setSuburbs] = useState<Suburb[]>([])
+  const [suburbQuery, setSuburbQuery] = useState('')
+  const [suburbSuggestions, setSuburbSuggestions] = useState<Suburb[]>([])
+  const [selectedLat, setSelectedLat] = useState<number | null>(null)
+  const [selectedLng, setSelectedLng] = useState<number | null>(null)
+
+  useEffect(() => { getSuburbs().then(setSuburbs) }, [])
+
+  const handleSuburbInput = (val: string) => {
+    setSuburbQuery(val)
+    updateForm('location', val)
+    setSelectedLat(null)
+    setSelectedLng(null)
+    setSuburbSuggestions(searchSuburbs(suburbs, val))
+  }
+
+  const selectSuburb = (s: Suburb) => {
+    const label = formatSuburb(s)
+    setSuburbQuery(label)
+    updateForm('location', label)
+    setSelectedLat(s.lat)
+    setSelectedLng(s.lng)
+    setSuburbSuggestions([])
+  }
 
   const updateForm = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -74,6 +100,8 @@ export default function EditListingPage() {
         subcategory: form.subcategory,
         condition: form.condition,
         location: form.location,
+        lat: selectedLat,
+        lng: selectedLng,
         aud_price: parseFloat(form.audPrice),
         token: form.token,
         quantity: parseInt(form.quantity),
@@ -163,8 +191,33 @@ export default function EditListingPage() {
             </div>
 
             <div className="mb-4">
-              <label className="text-xs mb-2 block" style={{ color: '#8B8B9E' }}>Location</label>
-              <input type="text" value={form.location} onChange={e => updateForm('location', e.target.value)} className="w-full px-4 py-3 rounded-lg text-white outline-none" style={{ backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A' }} />
+              <label className="text-xs mb-2 block" style={{ color: '#8B8B9E' }}>Location (suburb)</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  placeholder="e.g. Wooli, Coffs Harbour..."
+                  value={suburbQuery}
+                  onChange={e => handleSuburbInput(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg text-white outline-none"
+                  style={{ backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A' }}
+                  autoComplete="off"
+                />
+                {suburbSuggestions.length > 0 && (
+                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: '#13131A', border: '1px solid #2A2A3A', borderRadius: 8, marginTop: 4, overflow: 'hidden' }}>
+                    {suburbSuggestions.map((s, i) => (
+                      <div
+                        key={i}
+                        onClick={() => selectSuburb(s)}
+                        style={{ padding: '10px 14px', cursor: 'pointer', fontSize: '0.88rem', color: '#fff', borderBottom: '1px solid #1A1A2A' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = '#1A1A2A')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        {formatSuburb(s)}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="mb-4">
