@@ -12,7 +12,6 @@ export default function LandingPage() {
   const [activeCard, setActiveCard] = useState<number | null>(null)
   const [scrollY, setScrollY] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [modalEmail, setModalEmail] = useState('')
   const [modalSubmitted, setModalSubmitted] = useState(false)
