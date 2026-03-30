@@ -290,13 +290,34 @@ export default function TradesPage() {
                                 </div>
                                 <p className="text-xs" style={{ color: '#8B8B9E' }}>{new Date(listing.created_at).toLocaleDateString('en-AU')}</p>
                               </div>
-                              <button
-                                onClick={() => window.location.href = `/listing/${listing.id}`}
-                                className="w-full py-2 rounded-lg text-sm font-semibold text-white"
-                                style={{ backgroundColor: '#F7931A' }}
-                              >
-                                View Listing
-                              </button>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => window.location.href = `/listing/${listing.id}`}
+                                  className="flex-1 py-2 rounded-lg text-sm font-semibold text-white"
+                                  style={{ backgroundColor: '#F7931A' }}
+                                >
+                                  View
+                                </button>
+                                <button
+                                  onClick={() => window.location.href = `/sell/edit/${listing.id}`}
+                                  className="flex-1 py-2 rounded-lg text-sm font-semibold"
+                                  style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', color: '#8B8B9E' }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={async () => {
+                                    if (window.confirm(`Delete "${listing.title}"? This cannot be undone.`)) {
+                                      await supabase.from('listings').delete().eq('id', listing.id)
+                                      setSellerListings(prev => prev.filter(l => l.id !== listing.id))
+                                    }
+                                  }}
+                                  className="px-3 py-2 rounded-lg text-sm font-semibold"
+                                  style={{ backgroundColor: '#13131A', border: '1px solid #ff4444', color: '#ff4444' }}
+                                >
+                                  🗑
+                                </button>
+                              </div>
                             </div>
                           ))}
                         </>

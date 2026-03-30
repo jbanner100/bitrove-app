@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 
 interface PhotoUploadProps {
   onPhotosChange: (urls: string[]) => void
+  existingPhotos?: string[]
 }
 
 const MAX_FILES = 6
@@ -51,7 +52,7 @@ async function convertToWebP(file: File): Promise<Blob> {
   })
 }
 
-export default function PhotoUpload({ onPhotosChange }: PhotoUploadProps) {
+export default function PhotoUpload({ onPhotosChange, existingPhotos = [] }: PhotoUploadProps) {
   const [photos, setPhotos] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
