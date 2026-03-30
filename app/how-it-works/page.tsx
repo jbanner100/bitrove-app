@@ -543,7 +543,7 @@ export default function HowItWorksPage() {
             <StepCard n={1} icon="📥" title="Install a Wallet" body="Download MetaMask (Chrome/Firefox extension) or Coinbase Wallet. Create a wallet and safely store your seed phrase — this is the most important step. Never share your seed phrase with anyone, ever." />
             <StepCard n={2} icon="🔗" title="Add Polygon Network" body="Bitrove runs on Polygon (MATIC network). MetaMask will prompt you to add Polygon automatically when you click Connect on Bitrove. Polygon has near-zero gas fees — a fraction of a cent per transaction." />
             <StepCard n={3} icon="💰" title="Add Supported Tokens" body="You'll need USDT, WETH or WBTC on Polygon in your wallet to buy. Use a centralised exchange like Coinbase or Independent Reserve to purchase crypto, then bridge or send to your Polygon wallet." />
-            <StepCard n={4} icon="✅" title="Click Connect Wallet" body='Hit "Connect Wallet" in the top right of any Bitrove page. Select your wallet, approve the connection — no signing, no fees. You\'re in.' />
+            <StepCard n={4} icon="✅" title="Click Connect Wallet" body="Hit Connect Wallet in the top right of any Bitrove page. Select your wallet, approve the connection — no signing, no fees. You are in." />
           </div>
 
           <div style={{ marginTop: 36 }}>
