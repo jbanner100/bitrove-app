@@ -5,7 +5,7 @@ import PhotoUpload from '../components/PhotoUpload'
 import { supabase } from '../../lib/supabase'
 import { getSuburbs, searchSuburbs, formatSuburb, type Suburb } from '../../lib/suburbs'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { CATEGORIES, MAIN_CATEGORIES } from '../../lib/categories'
 
