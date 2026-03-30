@@ -182,8 +182,7 @@ export default function LandingPage() {
           .steps-grid{grid-template-columns:1fr !important}
           .pillars-grid{grid-template-columns:1fr 1fr !important}
           .hero-title{font-size:2.5rem !important}
-          .nav-desktop{display:none !important}
-        .hamburger{display:flex !important;flex-direction:column;background:transparent;border:none;cursor:pointer;padding:4px}
+          @media(min-width:769px){.nav-desktop{display:flex !important}.hamburger{display:none !important}}@media(max-width:768px){.nav-desktop{display:none !important}.hamburger{display:flex !important;flex-direction:column;background:transparent;border:none;cursor:pointer;padding:4px}}
           .stats-grid{grid-template-columns:1fr !important}
         }
       `}</style>
