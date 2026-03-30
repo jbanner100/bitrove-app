@@ -181,6 +181,7 @@ export default function HowItWorksPage() {
                 { e: '🔵', n: 'Coinbase Wallet', t: null },
                 { e: '🌈', n: 'Rainbow', t: null },
                 { e: '🛡️', n: 'Trust Wallet', t: null },
+                { e: '💳', n: 'Tangem', t: 'HARDWARE' },
                 { e: '🔌', n: 'WalletConnect', t: 'COMPATIBLE' },
               ].map(({ e, n, t }) => (
                 <div key={n} className="wchip">
