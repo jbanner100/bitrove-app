@@ -23,6 +23,7 @@ export default function LandingPage() {
   const [earlyAccessForm, setEarlyAccessForm] = useState({ name: '', email: '', wallet: '', whatList: '' })
   const [earlyAccessSubmitted, setEarlyAccessSubmitted] = useState(false)
   const [earlyAccessSubmitting, setEarlyAccessSubmitting] = useState(false)
+  const [generatedCode, setGeneratedCode] = useState('')
   const [accessCode, setAccessCode] = useState('')
   const [codeError, setCodeError] = useState('')
   const [codeChecking, setCodeChecking] = useState(false)
@@ -65,12 +66,16 @@ export default function LandingPage() {
     if (!earlyAccessForm.name || !earlyAccessForm.email) return
     setEarlyAccessSubmitting(true)
     try {
+      const num = Math.floor(1000 + Math.random() * 9000)
+      const code = 'BITROVE-EARLY-' + num
+      setGeneratedCode(code)
       await supabase.from('early_access').insert([{
         name: earlyAccessForm.name,
         email: earlyAccessForm.email,
         wallet_address: earlyAccessForm.wallet,
         what_would_you_list: earlyAccessForm.whatList,
-        status: 'pending',
+        status: 'approved',
+        access_code: code,
       }])
     } catch (err) {}
     setEarlyAccessSubmitted(true)
@@ -490,8 +495,11 @@ export default function LandingPage() {
             {earlyAccessSubmitted ? (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
                 <p style={{ fontSize: 40, marginBottom: 16 }}>🎉</p>
-                <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontSize: '1.5rem', fontWeight: 800, marginBottom: 12 }}>Request Received!</h2>
-                <p style={{ color: '#8B8B9E', fontSize: 14, lineHeight: 1.6 }}>Thanks for your interest in Bitrove early access. We'll review your application and send you an access code shortly.</p>
+                <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontSize: '1.5rem', fontWeight: 800, marginBottom: 12 }}>Welcome to Bitrove!</h2>
+                <p style={{ color: '#8B8B9E', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>You are in. Here is your exclusive early access code — enter it below to unlock the marketplace.</p>
+                <div style={{ background: '#0A0A0F', border: '1px solid #F7931A', borderRadius: 12, padding: '16px 20px', marginBottom: 20, fontFamily: 'monospace', fontSize: 18, fontWeight: 800, color: '#F7931A', letterSpacing: '0.08em' }}>{generatedCode}</div>
+                <button onClick={() => { navigator.clipboard.writeText(generatedCode) }} style={{ width: '100%', padding: '12px', borderRadius: 12, backgroundColor: '#13131A', border: '1px solid #2A2A3A', color: '#8B8B9E', fontWeight: 600, fontSize: 14, cursor: 'pointer', marginBottom: 12 }}>Copy Code</button>
+                <button onClick={() => { setAccessCode(generatedCode); setShowEarlyAccess(false); setEarlyAccessSubmitted(false); setShowCodeEntry(true) }} style={{ width: '100%', padding: '14px', borderRadius: 12, backgroundColor: '#F7931A', border: 'none', color: '#0A0A0F', fontWeight: 800, fontSize: 15, cursor: 'pointer' }}>Enter Marketplace →</button>
               </div>
             ) : (
               <>
