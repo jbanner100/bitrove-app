@@ -69,8 +69,8 @@ export default function Home() {
   const filteredByLocation = (items: any[]) => {
     if (!selectedSuburb) return items
     return items.filter(item => {
-      if (!item.lat || !item.lng) return false
-      const dist = haversineKm(selectedSuburb.lat, selectedSuburb.lng, item.lat, item.lng)
+      if (!item.lat || !item.lng) return true
+      const dist = haversineKm(selectedSuburb.lat, selectedSuburb.lng, Number(item.lat), Number(item.lng))
       return dist <= radiusKm
     })
   }
