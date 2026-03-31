@@ -192,6 +192,9 @@ export default function HowItWorksPage() {
               ))}
             </div>
           </div>
+          <div style={{ marginTop: 20, padding: '16px 22px', background: 'rgba(0,212,170,0.05)', border: '1px solid rgba(0,212,170,0.25)', borderRadius: 10, fontSize: '0.88rem', color: '#8B8B9E', lineHeight: 1.7 }}>
+            📱 <strong style={{ color: '#00D4AA' }}>Best mobile experience:</strong> Open Bitrove inside the MetaMask app for the smoothest ride. On iOS — tap the <strong style={{ color: '#fff' }}>Explore</strong> tab at the bottom of MetaMask, type <strong style={{ color: '#fff' }}>bitrove.com.au</strong> and you are in. No app switching, no popups. Our native app is on the way — stay tuned. 🚀
+          </div>
         </section>
 
         <div style={DIV} />
