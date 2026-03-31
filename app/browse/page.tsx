@@ -175,10 +175,11 @@ export default function Home() {
             placeholder="Search for anything..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
             className="flex-1 px-4 py-3 rounded-lg text-white outline-none"
             style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}
           />
-          <button className="px-6 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>Search</button>
+          <button onClick={() => setSearchQuery(searchQuery.trim())} className="px-6 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>Search</button>
         </div>
 
         {/* Location Filter */}
@@ -348,7 +349,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {listings.map((item) => {
+                {filteredByLocation(listings).map((item) => {
                   const config = tokenConfig[item.token as keyof typeof tokenConfig]
                   const cryptoPrice = getPrice(item.aud_price, item.token)
                   return (
