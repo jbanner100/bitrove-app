@@ -48,7 +48,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <WagmiProvider config={config}>
           <QueryClientProvider client={queryClient}>
-            <RainbowKitProvider modalSize="compact">
+            <RainbowKitProvider modalSize="wide">
               <XMTPProvider>
                 {children}
                 <Analytics />
