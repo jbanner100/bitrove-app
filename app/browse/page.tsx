@@ -7,6 +7,7 @@ import { useXMTP } from '../contexts/XMTPContext'
 import { useState, useEffect } from 'react'
 import { CATEGORIES, MAIN_CATEGORIES } from '../../lib/categories'
 import { supabase } from '../../lib/supabase'
+import { getSuburbs, searchSuburbs, formatSuburb, haversineKm, type Suburb } from '../../lib/suburbs'
 
 interface Prices {
   btc: number
@@ -39,6 +40,40 @@ export default function Home() {
   const [listings, setListings] = useState<any[]>([])
   const [listingsLoading, setListingsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [suburbs, setSuburbs] = useState<Suburb[]>([])
+  const [locationQuery, setLocationQuery] = useState('')
+  const [locationSuggestions, setLocationSuggestions] = useState<Suburb[]>([])
+  const [selectedSuburb, setSelectedSuburb] = useState<Suburb | null>(null)
+  const [radiusKm, setRadiusKm] = useState<number>(50)
+
+  useEffect(() => { getSuburbs().then(setSuburbs) }, [])
+
+  const handleLocationInput = (val: string) => {
+    setLocationQuery(val)
+    setSelectedSuburb(null)
+    setLocationSuggestions(searchSuburbs(suburbs, val))
+  }
+
+  const selectLocationSuburb = (s: Suburb) => {
+    setLocationQuery(formatSuburb(s))
+    setSelectedSuburb(s)
+    setLocationSuggestions([])
+  }
+
+  const clearLocation = () => {
+    setLocationQuery('')
+    setSelectedSuburb(null)
+    setLocationSuggestions([])
+  }
+
+  const filteredByLocation = (items: any[]) => {
+    if (!selectedSuburb) return items
+    return items.filter(item => {
+      if (!item.lat || !item.lng) return false
+      const dist = haversineKm(selectedSuburb.lat, selectedSuburb.lng, item.lat, item.lng)
+      return dist <= radiusKm
+    })
+  }
 
   // ── Price feed ──────────────────────────────────────────────────
   useEffect(() => {
@@ -144,6 +179,42 @@ export default function Home() {
             style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}
           />
           <button className="px-6 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>Search</button>
+        </div>
+
+        {/* Location Filter */}
+        <div className="max-w-2xl mx-auto mt-3 flex gap-2 flex-wrap">
+          <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
+            <input
+              type="text"
+              placeholder="📍 Filter by suburb..."
+              value={locationQuery}
+              onChange={e => handleLocationInput(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg text-white outline-none text-sm"
+              style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}
+              autoComplete="off"
+            />
+            {selectedSuburb && (
+              <button onClick={clearLocation} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#8B8B9E', cursor: 'pointer', fontSize: 16 }}>✕</button>
+            )}
+            {locationSuggestions.length > 0 && (
+              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: '#13131A', border: '1px solid #2A2A3A', borderRadius: 8, marginTop: 4, overflow: 'hidden' }}>
+                {locationSuggestions.map((s, i) => (
+                  <div key={i} onClick={() => selectLocationSuburb(s)} style={{ padding: '10px 14px', cursor: 'pointer', fontSize: '0.88rem', color: '#fff', borderBottom: '1px solid #1A1A2A' }} onMouseEnter={e => (e.currentTarget.style.background = '#1A1A2A')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                    {formatSuburb(s)}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          {selectedSuburb && (
+            <select value={radiusKm} onChange={e => setRadiusKm(Number(e.target.value))} className="px-3 py-2 rounded-lg text-sm text-white outline-none" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
+              <option value={10}>Within 10km</option>
+              <option value={25}>Within 25km</option>
+              <option value={50}>Within 50km</option>
+              <option value={100}>Within 100km</option>
+              <option value={250}>Within 250km</option>
+            </select>
+          )}
         </div>
       </div>
 
