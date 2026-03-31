@@ -360,20 +360,15 @@ export default function Home() {
                           <div className="w-full h-full flex items-center justify-center"><span style={{ fontSize: 48 }}>📦</span></div>
                         )}
                       </div>
-                      <div className="p-4">
-                        {item.is_featured && <div className="mb-2"><span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: '#F7931A22', border: '1px solid #F7931A', color: '#F7931A' }}>⭐ Featured</span></div>}
-                        <h3 className="text-white font-medium mb-1">{item.title}</h3>
-                        <p className="text-xs mb-3" style={{ color: '#8B8B9E' }}>{item.location}</p>
-                        <div className="mb-3"><span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: '#0A0A0F', border: `1px solid ${config.color}`, color: config.color }}>Settles in {item.token}</span></div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs" style={{ color: '#8B8B9E' }}>Price</p>
-                            <p className="font-bold text-lg" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
-                            <p className="text-xs" style={{ color: '#8B8B9E' }}>approx ${item.aud_price.toLocaleString()} AUD</p>
-                          </div>
-                          <button onClick={e => { e.stopPropagation(); window.location.href = `/listing/${item.id}` }} className="px-3 py-2 rounded-lg text-xs font-semibold text-white" style={{ backgroundColor: '#F7931A' }}>Buy Now</button>
+                      <div className="p-2">
+                        {item.is_featured && <div className="mb-1"><span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F7931A22', border: '1px solid #F7931A', color: '#F7931A' }}>⭐ Featured</span></div>}
+                        <h3 className="text-white text-xs font-medium mb-1 truncate">{item.title}</h3>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#0A0A0F', border: `1px solid ${config.color}`, color: config.color }}>Settles {item.token}</span>
+                          <span className="text-xs" style={{ color: '#00D4AA' }}>✓ Escrow</span>
                         </div>
-                        <div className="mt-3"><span className="text-xs" style={{ color: '#00D4AA' }}>✓ Escrow Protected</span></div>
+                        <p className="font-bold text-base" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
+                        <p className="text-xs" style={{ color: '#8B8B9E' }}>≈ ${item.aud_price.toLocaleString()} AUD</p>
                       </div>
                     </div>
                   )
