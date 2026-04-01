@@ -177,18 +177,18 @@ export default function HowItWorksPage() {
             <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, color: '#fff', fontSize: '0.95rem', marginBottom: 16 }}>Supported Wallets</div>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {[
-                { e: '🦊', n: 'MetaMask', t: 'RECOMMENDED' },
-                { e: '🔵', n: 'Coinbase Wallet', t: null },
-                { e: '🌈', n: 'Rainbow', t: null },
-                { e: '🛡️', n: 'Trust Wallet', t: null },
-                { e: '💳', n: 'Tangem', t: 'HARDWARE' },
-                { e: '🔌', n: 'WalletConnect', t: 'COMPATIBLE' },
-              ].map(({ e, n, t }) => (
-                <div key={n} className="wchip">
+                { e: '🦊', n: 'MetaMask', t: 'RECOMMENDED', url: 'https://metamask.io/download/' },
+                { e: '🔵', n: 'Coinbase Wallet', t: null, url: 'https://www.coinbase.com/wallet/downloads' },
+                { e: '🌈', n: 'Rainbow', t: null, url: 'https://rainbow.me/download' },
+                { e: '🛡️', n: 'Trust Wallet', t: null, url: 'https://trustwallet.com/download' },
+                { e: '💳', n: 'Tangem', t: 'HARDWARE', url: 'https://tangem.com' },
+                { e: '🔌', n: 'WalletConnect', t: 'COMPATIBLE', url: 'https://walletconnect.com/explorer' },
+              ].map(({ e, n, t, url }) => (
+                <a key={n} href={url} target="_blank" rel="noopener noreferrer" className="wchip" style={{ textDecoration: 'none' }}>
                   <span style={{ fontSize: '1.4rem' }}>{e}</span>
                   <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, color: '#fff', fontSize: '0.88rem' }}>{n}</span>
                   {t && <span style={{ fontSize: '0.72rem', background: 'rgba(247,147,26,0.15)', color: '#F7931A', padding: '2px 7px', borderRadius: 4, fontWeight: 600 }}>{t}</span>}
-                </div>
+                </a>
               ))}
             </div>
           </div>
