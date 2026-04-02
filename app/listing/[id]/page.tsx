@@ -49,6 +49,29 @@ export default function ListingPage() {
   const [reportSubmitted, setReportSubmitted] = useState(false)
   const [reportSubmitting, setReportSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [candles, setCandles] = useState<any[]>([])
+  const [currentTokenPrice, setCurrentTokenPrice] = useState<number>(0)
+
+  useEffect(() => {
+    if (!listing) return
+    if (listing.token === 'USDT') return
+    const symbol = listing.token === 'WBTC' ? 'BTCAUD' : 'ETHAUD'
+    const fetchCandles = async () => {
+      try {
+        const [candleRes, priceRes] = await Promise.all([
+          fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=168`),
+          fetch('/api/prices'),
+        ])
+        const candleData = await candleRes.json()
+        const priceData = await priceRes.json()
+        setCandles(candleData.map((c: any) => ({ time: c[0], open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4]) })))
+        setCurrentTokenPrice(listing.token === 'WBTC' ? priceData.btc : priceData.eth)
+      } catch (e) {}
+    }
+    fetchCandles()
+    const interval = setInterval(fetchCandles, 5 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [listing])
   const [selectedPhoto, setSelectedPhoto] = useState(0)
   const [showBuyModal, setShowBuyModal] = useState(false)
   const [deliveryAddress, setDeliveryAddress] = useState('')
