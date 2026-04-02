@@ -1,7 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 interface Candle {
   time: number
   open: number
@@ -13,48 +11,12 @@ interface Candle {
 interface Props {
   token: string
   listedTokenPrice: number | null
-  createdAt: string
+  currentPrice: number | null
+  candles: Candle[]
   compact?: boolean
 }
 
-const SYMBOLS: Record<string, string> = {
-  WBTC: 'BTCAUD',
-  WETH: 'ETHAUD',
-  USDT: null as any,
-}
-
-export default function PriceWidget({ token, listedTokenPrice, createdAt, compact = false }: Props) {
-  const [candles, setCandles] = useState<Candle[]>([])
-  const [currentPrice, setCurrentPrice] = useState<number | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  const symbol = SYMBOLS[token]
-
-  useEffect(() => {
-    if (!symbol) { setLoading(false); return }
-    const fetchData = async () => {
-      try {
-        const [candleRes, priceRes] = await Promise.all([
-          fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=168`),
-          fetch('/api/prices'),
-        ])
-        const candleData = await candleRes.json()
-        const priceData = await priceRes.json()
-        const parsed: Candle[] = candleData.map((c: any) => ({
-          time: c[0],
-          open: parseFloat(c[1]),
-          high: parseFloat(c[2]),
-          low: parseFloat(c[3]),
-          close: parseFloat(c[4]),
-        }))
-        setCandles(parsed)
-        setCurrentPrice(token === 'WBTC' ? priceData.btc : token === 'WETH' ? priceData.eth : priceData.usdt)
-      } catch (e) {}
-      setLoading(false)
-    }
-    fetchData()
-  }, [symbol, token])
-
+export default function PriceWidget({ token, listedTokenPrice, currentPrice, candles, compact = false }: Props) {
   if (token === 'USDT') {
     return (
       <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(0,212,170,0.1)', border: '1px solid rgba(0,212,170,0.3)', borderRadius: 6, padding: '3px 10px' }}>
@@ -63,13 +25,12 @@ export default function PriceWidget({ token, listedTokenPrice, createdAt, compac
     )
   }
 
-  if (loading || !listedTokenPrice || candles.length === 0) return null
+  if (!listedTokenPrice || candles.length === 0 || !currentPrice) return null
 
-  const pctChange = ((( currentPrice || listedTokenPrice) - listedTokenPrice) / listedTokenPrice) * 100
+  const pctChange = ((currentPrice - listedTokenPrice) / listedTokenPrice) * 100
   const isUp = pctChange >= 0
   const absPct = Math.abs(pctChange).toFixed(2)
 
-  // Compact mode — just the pill badge + sparkline
   if (compact) {
     const sparkCandles = candles.slice(-24)
     const allPrices = sparkCandles.flatMap(c => [c.high, c.low])
@@ -98,16 +59,14 @@ export default function PriceWidget({ token, listedTokenPrice, createdAt, compac
               </g>
             )
           })}
-          {listedTokenPrice && (
-            <line
-              x1={0} y1={h - ((listedTokenPrice - minP) / range) * h}
-              x2={w} y2={h - ((listedTokenPrice - minP) / range) * h}
-              stroke="#F7931A" strokeWidth={0.8} strokeDasharray="2,2"
-            />
-          )}
+          <line
+            x1={0} y1={h - ((listedTokenPrice - minP) / range) * h}
+            x2={w} y2={h - ((listedTokenPrice - minP) / range) * h}
+            stroke="#F7931A" strokeWidth={0.8} strokeDasharray="2,2"
+          />
         </svg>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(0,212,170,0.1)' : 'rgba(255,68,68,0.1)', border: `1px solid ${isUp ? 'rgba(0,212,170,0.3)' : 'rgba(255,68,68,0.3)'}`, borderRadius: 6, padding: '2px 7px' }}>
-          <span style={{ fontSize: '0.68rem', fontWeight: 700, color: isUp ? '#00D4AA' : '#ff4444' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(255,68,68,0.1)' : 'rgba(0,212,170,0.1)', border: `1px solid ${isUp ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,170,0.3)'}`, borderRadius: 6, padding: '2px 7px' }}>
+          <span style={{ fontSize: '0.68rem', fontWeight: 700, color: isUp ? '#ff4444' : '#00D4AA' }}>
             {isUp ? '▲' : '▼'} {absPct}%
           </span>
         </div>
@@ -115,7 +74,6 @@ export default function PriceWidget({ token, listedTokenPrice, createdAt, compac
     )
   }
 
-  // Full mode — full candlestick chart
   const allPrices = candles.flatMap(c => [c.high, c.low])
   const minP = Math.min(...allPrices, listedTokenPrice)
   const maxP = Math.max(...allPrices, listedTokenPrice)
@@ -123,16 +81,16 @@ export default function PriceWidget({ token, listedTokenPrice, createdAt, compac
   const W = 340
   const H = 120
   const listedY = H - ((listedTokenPrice - minP) / range) * H
-  const currentY = currentPrice ? H - ((currentPrice - minP) / range) * H : null
+  const currentY = H - ((currentPrice - minP) / range) * H
 
   return (
     <div style={{ background: '#0A0A0F', border: '1px solid #2A2A3A', borderRadius: 12, padding: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, color: '#8B8B9E', fontSize: '0.78rem' }}>
-          {token === 'WBTC' ? 'BTC' : 'ETH'} / AUD — 7 Day
+          {token === 'WBTC' ? 'BTC' : 'ETH'} / AUD — 7 Day Hourly
         </span>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(0,212,170,0.1)' : 'rgba(255,68,68,0.1)', border: `1px solid ${isUp ? 'rgba(0,212,170,0.3)' : 'rgba(255,68,68,0.3)'}`, borderRadius: 6, padding: '3px 10px' }}>
-          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: isUp ? '#00D4AA' : '#ff4444' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(255,68,68,0.1)' : 'rgba(0,212,170,0.1)', border: `1px solid ${isUp ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,170,0.3)'}`, borderRadius: 6, padding: '3px 10px' }}>
+          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: isUp ? '#ff4444' : '#00D4AA' }}>
             {isUp ? '▲' : '▼'} {absPct}% since listed
           </span>
         </div>
@@ -154,16 +112,10 @@ export default function PriceWidget({ token, listedTokenPrice, createdAt, compac
             </g>
           )
         })}
-        {/* Listed price line */}
         <line x1={0} y1={listedY} x2={W} y2={listedY} stroke="#F7931A" strokeWidth={1} strokeDasharray="4,3" />
         <text x={4} y={listedY - 4} fill="#F7931A" fontSize={8} fontWeight="600">Listed</text>
-        {/* Current price dot */}
-        {currentY !== null && (
-          <>
-            <circle cx={W - 4} cy={currentY} r={3} fill={isUp ? '#00D4AA' : '#ff4444'} />
-            <text x={W - 8} y={currentY - 6} fill={isUp ? '#00D4AA' : '#ff4444'} fontSize={8} textAnchor="end" fontWeight="600">Now</text>
-          </>
-        )}
+        <circle cx={W - 4} cy={currentY} r={3} fill={isUp ? '#ff4444' : '#00D4AA'} />
+        <text x={W - 8} y={currentY - 6} fill={isUp ? '#ff4444' : '#00D4AA'} fontSize={8} textAnchor="end" fontWeight="600">Now</text>
       </svg>
       <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -171,13 +123,13 @@ export default function PriceWidget({ token, listedTokenPrice, createdAt, compac
           <span style={{ fontSize: '0.68rem', color: '#8B8B9E' }}>Price when listed</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: isUp ? '#00D4AA' : '#ff4444' }} />
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: isUp ? '#ff4444' : '#00D4AA' }} />
           <span style={{ fontSize: '0.68rem', color: '#8B8B9E' }}>Current price</span>
         </div>
       </div>
       {isUp ? (
         <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(255,68,68,0.06)', borderRadius: 8, fontSize: '0.78rem', color: '#ff4444' }}>
-          📈 {token === 'WBTC' ? 'BTC' : 'ETH'} has risen since listing — seller is getting more value than expected
+          📈 {token === 'WBTC' ? 'BTC' : 'ETH'} has risen since listing — seller is getting more value than listed price
         </div>
       ) : (
         <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(0,212,170,0.06)', borderRadius: 8, fontSize: '0.78rem', color: '#00D4AA' }}>

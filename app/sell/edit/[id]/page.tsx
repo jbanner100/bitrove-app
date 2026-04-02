@@ -33,6 +33,14 @@ export default function EditListingPage() {
     postageCost: '0',
   })
 
+  const [editPrices, setEditPrices] = useState<Record<string, number>>({ WBTC: 0, WETH: 0, USDT: 1 })
+
+  useEffect(() => {
+    fetch('/api/prices').then(r => r.json()).then(d => {
+      setEditPrices({ WBTC: d.btc || 0, WETH: d.eth || 0, USDT: d.usdt || 1 })
+    }).catch(() => {})
+  }, [])
+
   const [suburbs, setSuburbs] = useState<Suburb[]>([])
   const [suburbQuery, setSuburbQuery] = useState('')
   const [suburbSuggestions, setSuburbSuggestions] = useState<Suburb[]>([])
@@ -102,6 +110,7 @@ export default function EditListingPage() {
         location: form.location,
         lat: selectedLat,
         lng: selectedLng,
+        listed_token_price: editPrices[form.token] || null,
         aud_price: parseFloat(form.audPrice),
         token: form.token,
         quantity: parseInt(form.quantity),

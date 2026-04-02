@@ -41,6 +41,29 @@ export default function Home() {
   const [listings, setListings] = useState<any[]>([])
   const [listingsLoading, setListingsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [btcCandles, setBtcCandles] = useState<any[]>([])
+  const [ethCandles, setEthCandles] = useState<any[]>([])
+  const [btcPrice, setBtcPrice] = useState<number>(0)
+  const [ethPrice, setEthPrice] = useState<number>(0)
+
+  const fetchCandles = async () => {
+    try {
+      const [btcRes, ethRes] = await Promise.all([
+        fetch('https://api.binance.com/api/v3/klines?symbol=BTCAUD&interval=1h&limit=168'),
+        fetch('https://api.binance.com/api/v3/klines?symbol=ETHAUD&interval=1h&limit=168'),
+      ])
+      const [btcData, ethData] = await Promise.all([btcRes.json(), ethRes.json()])
+      const parse = (data: any[]) => data.map((c: any) => ({ time: c[0], open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4]) }))
+      setBtcCandles(parse(btcData))
+      setEthCandles(parse(ethData))
+    } catch (e) {}
+  }
+
+  useEffect(() => {
+    fetchCandles()
+    const interval = setInterval(fetchCandles, 5 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [])
   const [suburbs, setSuburbs] = useState<Suburb[]>([])
   const [locationQuery, setLocationQuery] = useState('')
   const [locationSuggestions, setLocationSuggestions] = useState<Suburb[]>([])
@@ -88,6 +111,8 @@ export default function Home() {
           usdt: data.usdt || 1.58,
         })
         setPriceLoading(false)
+        setBtcPrice(data.btc || 0)
+        setEthPrice(data.eth || 0)
       } catch (e) {
         console.error('Price fetch failed:', e)
       }
@@ -373,7 +398,13 @@ export default function Home() {
                         <p className="text-xs" style={{ color: '#8B8B9E' }}>≈ ${item.aud_price.toLocaleString()} AUD</p>
                         {item.listed_token_price && (
                           <div className="mt-1" onClick={e => e.stopPropagation()}>
-                            <PriceWidget token={item.token} listedTokenPrice={item.listed_token_price} createdAt={item.created_at} compact={true} />
+                            <PriceWidget
+                              token={item.token}
+                              listedTokenPrice={item.listed_token_price}
+                              currentPrice={item.token === 'WBTC' ? btcPrice : item.token === 'WETH' ? ethPrice : 1}
+                              candles={item.token === 'WBTC' ? btcCandles : item.token === 'WETH' ? ethCandles : []}
+                              compact={true}
+                            />
                           </div>
                         )}
                       </div>

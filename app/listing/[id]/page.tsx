@@ -252,7 +252,13 @@ export default function ListingPage() {
             </div>
             {listing.listed_token_price && (
               <div className="mb-6">
-                <PriceWidget token={listing.token} listedTokenPrice={listing.listed_token_price} createdAt={listing.created_at} compact={false} />
+                <PriceWidget
+                  token={listing.token}
+                  listedTokenPrice={listing.listed_token_price}
+                  currentPrice={currentTokenPrice}
+                  candles={candles}
+                  compact={false}
+                />
               </div>
             )}
 
