@@ -65,8 +65,8 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
             stroke="#F7931A" strokeWidth={0.8} strokeDasharray="2,2"
           />
         </svg>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(255,68,68,0.1)' : 'rgba(0,212,170,0.1)', border: `1px solid ${isUp ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,170,0.3)'}`, borderRadius: 6, padding: '2px 7px' }}>
-          <span style={{ fontSize: '0.68rem', fontWeight: 700, color: isUp ? '#ff4444' : '#00D4AA' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(0,212,170,0.1)' : 'rgba(255,68,68,0.1)', border: `1px solid ${isUp ? 'rgba(0,212,170,0.3)' : 'rgba(255,68,68,0.3)'}`, borderRadius: 6, padding: '2px 7px' }}>
+          <span style={{ fontSize: '0.68rem', fontWeight: 700, color: isUp ? '#00D4AA' : '#ff4444' }}>
             {isUp ? '▲' : '▼'} {absPct}%
           </span>
         </div>
@@ -89,8 +89,8 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
         <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, color: '#8B8B9E', fontSize: '0.78rem' }}>
           {token === 'BTC' ? 'BTC' : 'ETH'} / AUD — 7 Day Hourly
         </span>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(255,68,68,0.1)' : 'rgba(0,212,170,0.1)', border: `1px solid ${isUp ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,170,0.3)'}`, borderRadius: 6, padding: '3px 10px' }}>
-          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: isUp ? '#ff4444' : '#00D4AA' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(0,212,170,0.1)' : 'rgba(255,68,68,0.1)', border: `1px solid ${isUp ? 'rgba(0,212,170,0.3)' : 'rgba(255,68,68,0.3)'}`, borderRadius: 6, padding: '3px 10px' }}>
+          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: isUp ? '#00D4AA' : '#ff4444' }}>
             {isUp ? '▲' : '▼'} {absPct}% since listed
           </span>
         </div>
@@ -114,8 +114,8 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
         })}
         <line x1={0} y1={listedY} x2={W} y2={listedY} stroke="#F7931A" strokeWidth={1} strokeDasharray="4,3" />
         <text x={4} y={listedY - 4} fill="#F7931A" fontSize={8} fontWeight="600">Listed</text>
-        <circle cx={W - 4} cy={currentY} r={3} fill={isUp ? '#ff4444' : '#00D4AA'} />
-        <text x={W - 8} y={currentY - 6} fill={isUp ? '#ff4444' : '#00D4AA'} fontSize={8} textAnchor="end" fontWeight="600">Now</text>
+        <circle cx={W - 4} cy={currentY} r={3} fill={isUp ? '#00D4AA' : '#ff4444'} />
+        <text x={W - 8} y={currentY - 6} fill={isUp ? '#00D4AA' : '#ff4444'} fontSize={8} textAnchor="end" fontWeight="600">Now</text>
       </svg>
       <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -123,16 +123,16 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
           <span style={{ fontSize: '0.68rem', color: '#8B8B9E' }}>Price when listed</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: isUp ? '#ff4444' : '#00D4AA' }} />
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: isUp ? '#00D4AA' : '#ff4444' }} />
           <span style={{ fontSize: '0.68rem', color: '#8B8B9E' }}>Current price</span>
         </div>
       </div>
       {isUp ? (
-        <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(255,68,68,0.06)', borderRadius: 8, fontSize: '0.78rem', color: '#ff4444' }}>
+        <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(0,212,170,0.06)', borderRadius: 8, fontSize: '0.78rem', color: '#00D4AA' }}>
           📈 {token === 'BTC' ? 'BTC' : 'ETH'} has risen since listing — seller is getting more value than listed price
         </div>
       ) : (
-        <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(0,212,170,0.06)', borderRadius: 8, fontSize: '0.78rem', color: '#00D4AA' }}>
+        <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(255,68,68,0.06)', borderRadius: 8, fontSize: '0.78rem', color: '#ff4444' }}>
           🔥 {token === 'BTC' ? 'BTC' : 'ETH'} dipped since listing — buyer gets more crypto for the same AUD price
         </div>
       )}

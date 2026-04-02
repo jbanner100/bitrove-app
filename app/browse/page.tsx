@@ -378,6 +378,13 @@ export default function Home() {
                 {filteredByLocation(listings).map((item) => {
                   const config = tokenConfig[item.token as keyof typeof tokenConfig]
                   const cryptoPrice = getPrice(item.aud_price, item.token)
+                  const liveAud = item.listed_token_price && item.token !== 'USDT'
+                    ? (() => {
+                        const lockedCrypto = item.aud_price / item.listed_token_price
+                        const currentP = item.token === 'BTC' ? btcPrice : item.token === 'ETH' ? ethPrice : 1
+                        return (lockedCrypto * currentP).toLocaleString('en-AU', { maximumFractionDigits: 0 })
+                      })()
+                    : item.aud_price.toLocaleString()
                   return (
                     <div key={item.id} onClick={() => window.location.href = `/listing/${item.id}`} className="rounded-xl overflow-hidden cursor-pointer transition-all" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }} onMouseEnter={e => (e.currentTarget.style.borderColor = '#F7931A')} onMouseLeave={e => (e.currentTarget.style.borderColor = '#2A2A3A')}>
                       <div style={{ backgroundColor: '#1A1A2A', aspectRatio: '1/1', overflow: 'hidden' }}>
@@ -395,7 +402,7 @@ export default function Home() {
                           <span className="text-xs" style={{ color: '#00D4AA' }}>✓ Escrow</span>
                         </div>
                         <p className="font-bold text-base" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
-                        <p className="text-xs" style={{ color: '#8B8B9E' }}>≈ ${item.aud_price.toLocaleString()} AUD</p>
+                        <p className="text-xs" style={{ color: '#8B8B9E' }}>≈ ${liveAud} AUD</p>
                         {item.listed_token_price && (
                           <div className="mt-1" onClick={e => e.stopPropagation()}>
                             <PriceWidget
