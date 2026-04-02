@@ -31,6 +31,14 @@ export default function SellPage() {
     postageCost: '0',
   })
 
+  const [prices, setPrices] = useState<Record<string, number>>({ WBTC: 0, WETH: 0, USDT: 1 })
+
+  useEffect(() => {
+    fetch('/api/prices').then(r => r.json()).then(d => {
+      setPrices({ WBTC: d.btc || 0, WETH: d.eth || 0, USDT: d.usdt || 1 })
+    }).catch(() => {})
+  }, [])
+
   const [suburbs, setSuburbs] = useState<Suburb[]>([])
   const [suburbQuery, setSuburbQuery] = useState('')
   const [suburbSuggestions, setSuburbSuggestions] = useState<Suburb[]>([])
@@ -85,7 +93,8 @@ export default function SellPage() {
         delivery_type: form.deliveryType,
         postage_cost: parseFloat(form.postageCost) || 0,
         lat: selectedLat,
-        lng: selectedLng
+        lng: selectedLng,
+        listed_token_price: prices[form.token] || null
       }])
       .select()
 

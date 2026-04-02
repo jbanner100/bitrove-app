@@ -7,6 +7,7 @@ import { useXMTP } from '../contexts/XMTPContext'
 import { useState, useEffect } from 'react'
 import { CATEGORIES, MAIN_CATEGORIES } from '../../lib/categories'
 import { supabase } from '../../lib/supabase'
+import PriceWidget from '../components/PriceWidget'
 import { getSuburbs, searchSuburbs, formatSuburb, haversineKm, type Suburb } from '../../lib/suburbs'
 
 interface Prices {
@@ -370,6 +371,11 @@ export default function Home() {
                         </div>
                         <p className="font-bold text-base" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
                         <p className="text-xs" style={{ color: '#8B8B9E' }}>≈ ${item.aud_price.toLocaleString()} AUD</p>
+                        {item.listed_token_price && (
+                          <div className="mt-1" onClick={e => e.stopPropagation()}>
+                            <PriceWidget token={item.token} listedTokenPrice={item.listed_token_price} createdAt={item.created_at} compact={true} />
+                          </div>
+                        )}
                       </div>
                     </div>
                   )

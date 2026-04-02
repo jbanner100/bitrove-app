@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation'
 import { useAccount, useWriteContract, usePublicClient } from 'wagmi'
 import { parseUnits, keccak256, encodePacked } from 'viem'
 import { supabase } from '../../../lib/supabase'
+import PriceWidget from '../../components/PriceWidget'
 import { CONTRACT_ADDRESS, CONTRACT_ABI, ERC20_ABI, TOKENS } from '../../../lib/contract'
 import { encryptAddress } from '../../../lib/encryption'
 import XMTPChat from '../../components/XMTPChat'
@@ -249,6 +250,11 @@ export default function ListingPage() {
               <p className="text-sm mt-1" style={{ color: '#8B8B9E' }}>≈ ${audPrice.toLocaleString()} AUD</p>
               <p className="text-xs mt-1" style={{ color: '#8B8B9E' }}>Price updates every 30 seconds</p>
             </div>
+            {listing.listed_token_price && (
+              <div className="mb-6">
+                <PriceWidget token={listing.token} listedTokenPrice={listing.listed_token_price} createdAt={listing.created_at} compact={false} />
+              </div>
+            )}
 
             <XMTPChat
               recipientAddress={listing.seller_address}
