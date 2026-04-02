@@ -33,11 +33,11 @@ export default function EditListingPage() {
     postageCost: '0',
   })
 
-  const [editPrices, setEditPrices] = useState<Record<string, number>>({ WBTC: 0, WETH: 0, USDT: 1 })
+  const [editPrices, setEditPrices] = useState<Record<string, number>>({ BTC: 0, ETH: 0, USDT: 1 })
 
   useEffect(() => {
     fetch('/api/prices').then(r => r.json()).then(d => {
-      setEditPrices({ WBTC: d.btc || 0, WETH: d.eth || 0, USDT: d.usdt || 1 })
+      setEditPrices({ BTC: d.btc || 0, ETH: d.eth || 0, USDT: d.usdt || 1 })
     }).catch(() => {})
   }, [])
 

@@ -55,7 +55,7 @@ export default function ListingPage() {
   useEffect(() => {
     if (!listing) return
     if (listing.token === 'USDT') return
-    const symbol = listing.token === 'WBTC' ? 'BTCAUD' : 'ETHAUD'
+    const symbol = listing.token === 'BTC' ? 'BTCAUD' : 'ETHAUD'
     const fetchCandles = async () => {
       try {
         const [candleRes, priceRes] = await Promise.all([
@@ -65,7 +65,7 @@ export default function ListingPage() {
         const candleData = await candleRes.json()
         const priceData = await priceRes.json()
         setCandles(candleData.map((c: any) => ({ time: c[0], open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4]) })))
-        setCurrentTokenPrice(listing.token === 'WBTC' ? priceData.btc : priceData.eth)
+        setCurrentTokenPrice(listing.token === 'BTC' ? priceData.btc : priceData.eth)
       } catch (e) {}
     }
     fetchCandles()

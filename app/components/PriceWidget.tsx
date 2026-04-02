@@ -87,7 +87,7 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
     <div style={{ background: '#0A0A0F', border: '1px solid #2A2A3A', borderRadius: 12, padding: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, color: '#8B8B9E', fontSize: '0.78rem' }}>
-          {token === 'WBTC' ? 'BTC' : 'ETH'} / AUD — 7 Day Hourly
+          {token === 'BTC' ? 'BTC' : 'ETH'} / AUD — 7 Day Hourly
         </span>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(255,68,68,0.1)' : 'rgba(0,212,170,0.1)', border: `1px solid ${isUp ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,170,0.3)'}`, borderRadius: 6, padding: '3px 10px' }}>
           <span style={{ fontSize: '0.78rem', fontWeight: 700, color: isUp ? '#ff4444' : '#00D4AA' }}>
@@ -129,11 +129,11 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
       </div>
       {isUp ? (
         <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(255,68,68,0.06)', borderRadius: 8, fontSize: '0.78rem', color: '#ff4444' }}>
-          📈 {token === 'WBTC' ? 'BTC' : 'ETH'} has risen since listing — seller is getting more value than listed price
+          📈 {token === 'BTC' ? 'BTC' : 'ETH'} has risen since listing — seller is getting more value than listed price
         </div>
       ) : (
         <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(0,212,170,0.06)', borderRadius: 8, fontSize: '0.78rem', color: '#00D4AA' }}>
-          🔥 {token === 'WBTC' ? 'BTC' : 'ETH'} dipped since listing — buyer gets more crypto for the same AUD price
+          🔥 {token === 'BTC' ? 'BTC' : 'ETH'} dipped since listing — buyer gets more crypto for the same AUD price
         </div>
       )}
     </div>

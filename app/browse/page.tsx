@@ -401,8 +401,8 @@ export default function Home() {
                             <PriceWidget
                               token={item.token}
                               listedTokenPrice={item.listed_token_price}
-                              currentPrice={item.token === 'WBTC' ? btcPrice : item.token === 'WETH' ? ethPrice : 1}
-                              candles={item.token === 'WBTC' ? btcCandles : item.token === 'WETH' ? ethCandles : []}
+                              currentPrice={item.token === 'BTC' ? btcPrice : item.token === 'ETH' ? ethPrice : 1}
+                              candles={item.token === 'BTC' ? btcCandles : item.token === 'ETH' ? ethCandles : []}
                               compact={true}
                             />
                           </div>

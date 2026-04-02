@@ -31,11 +31,11 @@ export default function SellPage() {
     postageCost: '0',
   })
 
-  const [prices, setPrices] = useState<Record<string, number>>({ WBTC: 0, WETH: 0, USDT: 1 })
+  const [prices, setPrices] = useState<Record<string, number>>({ BTC: 0, ETH: 0, USDT: 1 })
 
   useEffect(() => {
     fetch('/api/prices').then(r => r.json()).then(d => {
-      setPrices({ WBTC: d.btc || 0, WETH: d.eth || 0, USDT: d.usdt || 1 })
+      setPrices({ BTC: d.btc || 0, ETH: d.eth || 0, USDT: d.usdt || 1 })
     }).catch(() => {})
   }, [])
 
