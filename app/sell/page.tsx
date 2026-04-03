@@ -157,17 +157,33 @@ export default function SellPage() {
 
                 <div className="mb-4">
                   <label className="text-xs mb-2 block" style={{ color: '#8B8B9E' }}>Category</label>
-                  <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    {MAIN_CATEGORIES.map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => { updateForm('category', cat); updateForm('subcategory', '') }}
-                        className="px-3 py-2 rounded-lg text-sm whitespace-nowrap flex-shrink-0"
-                        style={{ backgroundColor: form.category === cat ? '#F7931A' : '#0A0A0F', border: `1px solid ${form.category === cat ? '#F7931A' : '#2A2A3A'}`, color: form.category === cat ? '#fff' : '#8B8B9E' }}
-                      >
-                        {cat}
-                      </button>
-                    ))}
+                  <style>{`
+                    .sell-cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+                    @media (max-width: 480px) { .sell-cat-grid { grid-template-columns: repeat(3, 1fr); } }
+                    .sell-cat-card { background: #0A0A0F; border: 1px solid #2A2A3A; border-radius: 12px; padding: 10px 6px 8px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.2s; }
+                    .sell-cat-card:hover { border-color: #F7931A; transform: translateY(-1px); background: #1A1A24; }
+                    .sell-cat-card.sc-active { border-color: #F7931A; background: rgba(247,147,26,0.08); }
+                    .sell-cat-icon { font-size: 20px; line-height: 1; transition: transform 0.2s; }
+                    .sell-cat-card:hover .sell-cat-icon { transform: scale(1.15) rotate(-4deg); }
+                    .sell-cat-card.sc-active .sell-cat-icon { transform: scale(1.1); }
+                    .sell-cat-label { font-size: 9px; font-weight: 600; color: #8B8B9E; text-align: center; line-height: 1.2; transition: color 0.2s; }
+                    .sell-cat-card:hover .sell-cat-label, .sell-cat-card.sc-active .sell-cat-label { color: #F7931A; }
+                  `}</style>
+                  <div className="sell-cat-grid">
+                    {(() => {
+                      const categoryIcons: Record<string, string> = {
+                        'Electronics': '💻', 'Vehicles': '🚗', 'Boats & Marine': '⛵',
+                        'Fashion': '👗', 'Home & Garden': '🏡', 'Sports & Outdoors': '🏄',
+                        'Gaming': '🎮', 'Music': '🎸', 'Collectibles': '🏆',
+                        'Tools & Equipment': '🔧', 'Other': '📦',
+                      }
+                      return MAIN_CATEGORIES.map(cat => (
+                        <div key={cat} className={`sell-cat-card ${form.category === cat ? 'sc-active' : ''}`} onClick={() => { updateForm('category', cat); updateForm('subcategory', '') }}>
+                          <span className="sell-cat-icon">{categoryIcons[cat] || '📦'}</span>
+                          <span className="sell-cat-label">{cat}</span>
+                        </div>
+                      ))
+                    })()}
                   </div>
                   {form.category && CATEGORIES[form.category] && (
                     <div className="mt-2">
