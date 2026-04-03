@@ -9,7 +9,6 @@ interface PhotoUploadProps {
 }
 
 const MAX_FILES = 6
-const MAX_SIZE_MB = 5
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 async function convertToWebP(file: File): Promise<Blob> {
@@ -75,10 +74,7 @@ export default function PhotoUpload({ onPhotosChange, existingPhotos = [] }: Pho
         setError('Only JPG, PNG and WebP images are allowed')
         return
       }
-      if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-        setError(`Each photo must be under ${MAX_SIZE_MB}MB`)
-        return
-      }
+
     }
 
     setUploading(true)
@@ -132,7 +128,7 @@ export default function PhotoUpload({ onPhotosChange, existingPhotos = [] }: Pho
   return (
     <div>
       <label className="text-xs mb-2 block" style={{ color: '#8B8B9E' }}>
-        Photos (up to {MAX_FILES} — JPG, PNG, WebP — max {MAX_SIZE_MB}MB each)
+        Photos (up to {MAX_FILES} — JPG, PNG, WebP — auto resized and optimised)
       </label>
 
       {/* Upload area */}
