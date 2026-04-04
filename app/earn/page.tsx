@@ -101,8 +101,8 @@ export default function EarnPage() {
           <div style={{ display: 'inline-block', background: 'rgba(247,147,26,0.12)', border: '1px solid rgba(247,147,26,0.3)', color: '#F7931A', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '6px 16px', borderRadius: 20, marginBottom: 22 }}>
             {spotsLeft > 0 ? `${spotsLeft} spots remaining` : 'All spots claimed'}
           </div>
-          <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.12, letterSpacing: '-0.03em', color: '#fff', marginBottom: 20, maxWidth: 680, marginLeft: 'auto', marginRight: 'auto' }}>
-            Get Paid <span style={{ color: '#00D4AA' }}>5 USDT</span> to List on Bitrove
+          <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.02em', color: '#fff', marginBottom: 20, maxWidth: 580, marginLeft: 'auto', marginRight: 'auto' }}>
+            List on Bitrove. Earn <span style={{ color: '#00D4AA' }}>$5 USDT</span> in 7 Days.
           </h1>
           <p style={{ fontSize: '1.1rem', color: '#8B8B9E', maxWidth: 540, margin: '0 auto 36px', lineHeight: 1.7 }}>
             We need real listings from real people. You need crypto. Simple deal.
