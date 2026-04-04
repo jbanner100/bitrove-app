@@ -213,7 +213,7 @@ export default function LandingPage() {
           <a className="nav-link" href="/how-it-works" style={{ textDecoration: 'none' }}>How it Works</a>
           <span className="nav-link" onClick={() => scrollTo('why-bitrove')}>Why Bitrove</span>
           <span className="nav-link" onClick={() => setShowEarlyAccess(true)} style={{ cursor: 'pointer' }}>Get Access</span>
-          <button onClick={() => setShowEarlyAccess(true)} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '8px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, transition: 'all 0.2s', background: 'transparent', cursor: 'pointer' }}>
+          <button onClick={() => setShowCodeEntry(true)} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '8px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, transition: 'all 0.2s', background: 'transparent', cursor: 'pointer' }}>
             Enter Marketplace →
           </button>
         </div>
@@ -228,7 +228,7 @@ export default function LandingPage() {
           <a href="/how-it-works" onClick={() => setMenuOpen(false)} style={{ color: '#8B8B9E', fontSize: 16, fontWeight: 500, textDecoration: 'none' }}>How it Works</a>
           <span onClick={() => { scrollTo('why-bitrove'); setMenuOpen(false) }} style={{ color: '#8B8B9E', fontSize: 16, fontWeight: 500, cursor: 'pointer' }}>Why Bitrove</span>
           <span onClick={() => { setShowEarlyAccess(true); setMenuOpen(false) }} style={{ color: '#8B8B9E', fontSize: 16, fontWeight: 500, cursor: 'pointer' }}>Get Access</span>
-          <button onClick={() => { setShowEarlyAccess(true); setMenuOpen(false) }} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '10px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
+          <button onClick={() => { setShowCodeEntry(true); setMenuOpen(false) }} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '10px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
             Enter Marketplace →
           </button>
         </div>
@@ -279,7 +279,7 @@ export default function LandingPage() {
         </p>
 
         <div className="fade-up-3" style={{ display: 'flex', gap: 16, marginBottom: 80, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <button className="btn-primary" onClick={() => setShowEarlyAccess(true)} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16 }}>
+          <button className="btn-primary" onClick={() => setShowCodeEntry(true)} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16 }}>
             Enter Marketplace
           </button>
           <button onClick={() => setShowCodeEntry(true)} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16, fontWeight: 600, color: '#fff', border: '1px solid #2A2A3A', backgroundColor: '#13131A', cursor: 'pointer' }}>
