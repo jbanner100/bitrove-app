@@ -439,7 +439,7 @@ export default function ListingPage() {
                   />
                   {bidAmount && parseFloat(bidAmount) > 0 && (
                     <p style={{ color: '#00D4AA', fontSize: '0.78rem', marginTop: 6 }}>
-                      ≈ {listing.token === 'USDT' ? '' : config.symbol} {listing.token === "BTC" ? prices.btc : listing.token === "ETH" ? prices.eth : prices.usdt ? (parseFloat(bidAmount) / prices[listing.token]).toFixed(6) : '...'} {listing.token}
+                      ≈ {listing.token === 'USDT' ? '' : config.symbol} {(parseFloat(bidAmount) / (listing.token === 'BTC' ? prices.btc : listing.token === 'ETH' ? prices.eth : prices.usdt)).toFixed(6)} {listing.token}
                     </p>
                   )}
                 </div>
