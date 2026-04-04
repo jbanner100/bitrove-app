@@ -19,9 +19,9 @@ export default function EarnPage() {
     // Fetch enrolled count
     supabase
       .from('listing_rewards')
-      .select('id', { count: 'exact' })
+      .select('*', { count: 'exact', head: true })
       .in('status', ['enrolled', 'approved', 'paid'])
-      .then(({ count }) => { if (count) setSpotsUsed(count + 60) })
+      .then(({ count }) => { setSpotsUsed((count || 0) + 60) })
   }, [])
 
   const spotsLeft = Math.max(0, TOTAL_SPOTS - spotsUsed)
