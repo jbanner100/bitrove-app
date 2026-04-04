@@ -49,6 +49,15 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.svg" />
         <meta name="theme-color" content="#F7931A" />
+        <meta property="og:title" content="Bitrove — Buy. Sell. Get paid in crypto." />
+        <meta property="og:description" content="Peer-to-peer marketplace with smart contract escrow. No KYC, no banks, no middlemen." />
+        <meta property="og:image" content="https://www.bitrove.com.au/og-image.png" />
+        <meta property="og:url" content="https://www.bitrove.com.au" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Bitrove — Buy. Sell. Get paid in crypto." />
+        <meta name="twitter:description" content="Peer-to-peer marketplace with smart contract escrow. No KYC, no banks, no middlemen." />
+        <meta name="twitter:image" content="https://www.bitrove.com.au/og-image.png" />
       </head>
       <body className={inter.className}>
         <WagmiProvider config={config}>
