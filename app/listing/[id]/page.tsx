@@ -49,10 +49,7 @@ export default function ListingPage() {
   const [reportSubmitted, setReportSubmitted] = useState(false)
   const [reportSubmitting, setReportSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [prices, setPrices] = useState<Record<string, number>>({ BTC: 0, ETH: 0, USDT: 1 })
-  useEffect(() => {
-    fetch('/api/prices').then(r => r.json()).then(d => setPrices({ BTC: d.btc || 0, ETH: d.eth || 0, USDT: d.usdt || 1 })).catch(() => {})
-  }, [])
+
   const [candles, setCandles] = useState<any[]>([])
   const [currentTokenPrice, setCurrentTokenPrice] = useState<number>(0)
 
@@ -442,7 +439,7 @@ export default function ListingPage() {
                   />
                   {bidAmount && parseFloat(bidAmount) > 0 && (
                     <p style={{ color: '#00D4AA', fontSize: '0.78rem', marginTop: 6 }}>
-                      ≈ {listing.token === 'USDT' ? '' : config.symbol} {prices[listing.token] ? (parseFloat(bidAmount) / prices[listing.token]).toFixed(6) : '...'} {listing.token}
+                      ≈ {listing.token === 'USDT' ? '' : config.symbol} {listing.token === "BTC" ? prices.btc : listing.token === "ETH" ? prices.eth : prices.usdt ? (parseFloat(bidAmount) / prices[listing.token]).toFixed(6) : '...'} {listing.token}
                     </p>
                   )}
                 </div>
