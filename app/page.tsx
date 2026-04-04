@@ -212,8 +212,8 @@ export default function LandingPage() {
         <div className="nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
           <a className="nav-link" href="/how-it-works" style={{ textDecoration: 'none' }}>How it Works</a>
           <span className="nav-link" onClick={() => scrollTo('why-bitrove')}>Why Bitrove</span>
-          <span className="nav-link" onClick={() => scrollTo('waitlist')}>Join Waitlist</span>
-          <button onClick={handleMarketplaceClick} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '8px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, transition: 'all 0.2s', background: 'transparent', cursor: 'pointer' }}>
+          <span className="nav-link" onClick={() => setShowEarlyAccess(true)} style={{ cursor: 'pointer' }}>Get Access</span>
+          <button onClick={() => setShowEarlyAccess(true)} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '8px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, transition: 'all 0.2s', background: 'transparent', cursor: 'pointer' }}>
             Enter Marketplace →
           </button>
         </div>
@@ -227,8 +227,8 @@ export default function LandingPage() {
         <div style={{ position: 'fixed', top: 60, left: 0, right: 0, zIndex: 99, background: 'rgba(10,10,15,0.97)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #1A1A2A', padding: '24px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
           <a href="/how-it-works" onClick={() => setMenuOpen(false)} style={{ color: '#8B8B9E', fontSize: 16, fontWeight: 500, textDecoration: 'none' }}>How it Works</a>
           <span onClick={() => { scrollTo('why-bitrove'); setMenuOpen(false) }} style={{ color: '#8B8B9E', fontSize: 16, fontWeight: 500, cursor: 'pointer' }}>Why Bitrove</span>
-          <span onClick={() => { scrollTo('waitlist'); setMenuOpen(false) }} style={{ color: '#8B8B9E', fontSize: 16, fontWeight: 500, cursor: 'pointer' }}>Join Waitlist</span>
-          <button onClick={handleMarketplaceClick} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '10px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
+          <span onClick={() => { setShowEarlyAccess(true); setMenuOpen(false) }} style={{ color: '#8B8B9E', fontSize: 16, fontWeight: 500, cursor: 'pointer' }}>Get Access</span>
+          <button onClick={() => { setShowEarlyAccess(true); setMenuOpen(false) }} style={{ color: '#F7931A', fontSize: 14, fontWeight: 600, padding: '10px 18px', border: '1px solid rgba(247,147,26,0.4)', borderRadius: 8, background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
             Enter Marketplace →
           </button>
         </div>
@@ -240,7 +240,7 @@ export default function LandingPage() {
 
         <div className="fade-up" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 100, border: '1px solid rgba(247,147,26,0.4)', background: 'rgba(247,147,26,0.1)', fontSize: 12, fontWeight: 600, color: '#F7931A', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 32 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#F7931A', display: 'inline-block', animation: 'pulse-dot 2s ease-in-out infinite' }} />
-          Live Soon — Join the Waitlist
+          Now Live — Request Early Access
         </div>
 
         <h1 className="hero-title fade-up-1" style={{ fontFamily: 'Syne, sans-serif', fontSize: '3.5rem', fontWeight: 800, lineHeight: 1.1, marginBottom: 20, maxWidth: 900 }}>
@@ -279,8 +279,8 @@ export default function LandingPage() {
         </p>
 
         <div className="fade-up-3" style={{ display: 'flex', gap: 16, marginBottom: 80, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <button className="btn-primary" onClick={() => scrollTo('waitlist')} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16 }}>
-            Join Waitlist
+          <button className="btn-primary" onClick={() => setShowEarlyAccess(true)} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16 }}>
+            Enter Marketplace
           </button>
           <button onClick={() => setShowCodeEntry(true)} style={{ padding: '16px 36px', borderRadius: 100, fontSize: 16, fontWeight: 600, color: '#fff', border: '1px solid #2A2A3A', backgroundColor: '#13131A', cursor: 'pointer' }}>
             Request Early Access
