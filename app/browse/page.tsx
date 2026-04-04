@@ -41,6 +41,18 @@ export default function Home() {
   const [listings, setListings] = useState<any[]>([])
   const [listingsLoading, setListingsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [currency, setCurrency] = useState<string>(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('bitrove_currency') || 'AUD'
+    return 'AUD'
+  })
+
+  const currencySymbols: Record<string, string> = { AUD: 'A$', USD: '$', EUR: '€', GBP: '£' }
+  const currencyFlags: Record<string, string> = { AUD: '🇦🇺', USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧' }
+
+  const selectCurrency = (c: string) => {
+    setCurrency(c)
+    if (typeof window !== 'undefined') localStorage.setItem('bitrove_currency', c)
+  }
   const [btcCandles, setBtcCandles] = useState<any[]>([])
   const [ethCandles, setEthCandles] = useState<any[]>([])
   const [btcPrice, setBtcPrice] = useState<number>(0)
@@ -105,14 +117,15 @@ export default function Home() {
       try {
         const res = await fetch('/api/prices')
         const data = await res.json()
+        const currData = data[currency] || data
         setPrices({
-          btc: data.btc || 0,
-          eth: data.eth || 0,
-          usdt: data.usdt || 1.58,
+          btc: currData.btc || 0,
+          eth: currData.eth || 0,
+          usdt: currData.usdt || 1,
         })
         setPriceLoading(false)
-        setBtcPrice(data.btc || 0)
-        setEthPrice(data.eth || 0)
+        setBtcPrice(currData.btc || 0)
+        setEthPrice(currData.eth || 0)
       } catch (e) {
         console.error('Price fetch failed:', e)
       }
@@ -120,7 +133,7 @@ export default function Home() {
     fetchPrices()
     const interval = setInterval(fetchPrices, 30000)
     return () => clearInterval(interval)
-  }, [])
+  }, [currency])
 
   // ── Listings fetch ──────────────────────────────────────────────
   useEffect(() => {
@@ -166,6 +179,19 @@ export default function Home() {
         <div className="flex items-center gap-3">
           <XMTPBadge />
           <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
+          <div style={{ position: 'relative' }}>
+            <select
+              value={currency}
+              onChange={e => selectCurrency(e.target.value)}
+              className="px-3 py-2 rounded-lg text-sm font-semibold outline-none cursor-pointer"
+              style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', color: '#F7931A' }}
+            >
+              <option value="AUD">🇦🇺 AUD</option>
+              <option value="USD">🇺🇸 USD</option>
+              <option value="EUR">🇪🇺 EUR</option>
+              <option value="GBP">🇬🇧 GBP</option>
+            </select>
+          </div>
           <button
             className="md:hidden px-3 py-2 rounded-lg text-sm"
             style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', color: '#F7931A' }}
@@ -402,7 +428,7 @@ export default function Home() {
                           <span className="text-xs" style={{ color: '#00D4AA' }}>✓ Escrow</span>
                         </div>
                         <p className="font-bold text-base" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
-                        <p className="text-xs" style={{ color: '#8B8B9E' }}>≈ ${liveAud} AUD</p>
+                        <p className="text-xs" style={{ color: '#8B8B9E' }}>≈ {currencySymbols[currency]}{liveAud} {currency}</p>
                         {item.listed_token_price && (
                           <div className="mt-1" onClick={e => e.stopPropagation()}>
                             <PriceWidget
