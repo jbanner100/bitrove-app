@@ -293,6 +293,23 @@ export default function EarnPage() {
 
         <div className="divider" />
 
+        {/* LINKS */}
+        <section className="earn-section" style={{ paddingTop: 40, paddingBottom: 40 }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Link href="/browse" style={{ flex: 1, minWidth: 160, textAlign: 'center', padding: '14px 20px', background: '#F7931A', color: '#0A0A0F', borderRadius: 10, fontFamily: "'Syne', sans-serif", fontWeight: 700, textDecoration: 'none', fontSize: '0.9rem' }}>
+              🛒 Browse Marketplace
+            </Link>
+            <Link href="/sell" style={{ flex: 1, minWidth: 160, textAlign: 'center', padding: '14px 20px', background: 'transparent', color: '#fff', borderRadius: 10, fontFamily: "'Syne', sans-serif", fontWeight: 700, textDecoration: 'none', fontSize: '0.9rem', border: '1px solid #2A2A3A' }}>
+              📦 List an Item
+            </Link>
+            <Link href="/how-it-works" style={{ flex: 1, minWidth: 160, textAlign: 'center', padding: '14px 20px', background: 'transparent', color: '#fff', borderRadius: 10, fontFamily: "'Syne', sans-serif", fontWeight: 700, textDecoration: 'none', fontSize: '0.9rem', border: '1px solid #2A2A3A' }}>
+              📖 How It Works
+            </Link>
+          </div>
+        </section>
+
+        <div className="divider" />
+
         {/* FOOTER */}
         <div style={{ textAlign: 'center', padding: '32px 24px', color: '#8B8B9E', fontSize: '0.83rem' }}>
           <span style={{ color: '#F7931A' }}>Bitrove</span> — Buy. Sell. Get paid in crypto. 🚀 &nbsp;|&nbsp;{' '}
