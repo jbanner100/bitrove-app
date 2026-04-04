@@ -49,6 +49,10 @@ export default function ListingPage() {
   const [reportSubmitted, setReportSubmitted] = useState(false)
   const [reportSubmitting, setReportSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [prices, setPrices] = useState<Record<string, number>>({ BTC: 0, ETH: 0, USDT: 1 })
+  useEffect(() => {
+    fetch('/api/prices').then(r => r.json()).then(d => setPrices({ BTC: d.btc || 0, ETH: d.eth || 0, USDT: d.usdt || 1 })).catch(() => {})
+  }, [])
   const [candles, setCandles] = useState<any[]>([])
   const [currentTokenPrice, setCurrentTokenPrice] = useState<number>(0)
 
@@ -74,6 +78,53 @@ export default function ListingPage() {
   }, [listing])
   const [selectedPhoto, setSelectedPhoto] = useState(0)
   const [showBuyModal, setShowBuyModal] = useState(false)
+  const [showBidModal, setShowBidModal] = useState(false)
+  const [bidAmount, setBidAmount] = useState('')
+  const [bidExpiry, setBidExpiry] = useState('48')
+  const [bidSubmitting, setBidSubmitting] = useState(false)
+  const [bidSuccess, setBidSuccess] = useState(false)
+  const [bids, setBids] = useState<any[]>([])
+  const [userBid, setUserBid] = useState<any>(null)
+
+  useEffect(() => {
+    if (!listing) return
+    const fetchBids = async () => {
+      const { data } = await supabase
+        .from('bids')
+        .select('*')
+        .eq('listing_id', listing.id)
+        .eq('status', 'pending')
+        .order('aud_amount', { ascending: false })
+      if (data) {
+        setBids(data)
+        if (address) setUserBid(data.find((b: any) => b.buyer_address.toLowerCase() === address.toLowerCase()) || null)
+      }
+    }
+    fetchBids()
+    const interval = setInterval(fetchBids, 10000)
+    return () => clearInterval(interval)
+  }, [listing, address])
+
+  const handlePlaceBid = async () => {
+    if (!address || !bidAmount || !listing) return
+    setBidSubmitting(true)
+    const aud = parseFloat(bidAmount)
+    const priceMap: Record<string, number> = { BTC: prices.btc, ETH: prices.eth, USDT: prices.usdt }
+    const crypto = priceMap[listing.token] ? aud / priceMap[listing.token] : 0
+    const expiresAt = new Date(Date.now() + parseInt(bidExpiry) * 60 * 60 * 1000).toISOString()
+    await supabase.from('bids').insert([{
+      listing_id: listing.id,
+      buyer_address: address,
+      aud_amount: aud,
+      crypto_amount: crypto,
+      token: listing.token,
+      status: 'pending',
+      expires_at: expiresAt,
+    }])
+    setBidSubmitting(false)
+    setBidSuccess(true)
+    setTimeout(() => { setShowBidModal(false); setBidSuccess(false); setBidAmount('') }, 2000)
+  }
   const [deliveryAddress, setDeliveryAddress] = useState('')
   const [buyStep, setBuyStep] = useState<'details' | 'approving' | 'funding' | 'complete'>('details')
   const [error, setError] = useState('')
@@ -292,13 +343,60 @@ export default function ListingPage() {
               listingId={listing.id}
             />
 
-            <button
-              onClick={() => setShowBuyModal(true)}
-              className="w-full py-4 rounded-xl font-bold text-white text-lg mb-4"
-              style={{ backgroundColor: '#F7931A' }}
-            >
-              Buy Now — Escrow Protected
-            </button>
+            {/* Order Book */}
+            {bids.length > 0 && (
+              <div className="rounded-xl p-4 mb-4" style={{ backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A' }}>
+                <div className="flex justify-between items-center mb-3">
+                  <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, color: '#fff', fontSize: '0.85rem' }}>📊 Order Book</span>
+                  <span style={{ fontSize: '0.72rem', color: '#8B8B9E' }}>{bids.length} bid{bids.length !== 1 ? 's' : ''}</span>
+                </div>
+                <div style={{ borderBottom: '1px solid #2A2A3A', paddingBottom: 8, marginBottom: 8 }}>
+                  <div className="flex justify-between">
+                    <span style={{ fontSize: '0.72rem', color: '#8B8B9E' }}>ASK</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#F7931A' }}>${audPrice.toLocaleString()} AUD</span>
+                  </div>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#8B8B9E', marginBottom: 6 }}>BIDS</div>
+                {bids.slice(0, 5).map((bid, i) => {
+                  const hoursLeft = Math.max(0, Math.round((new Date(bid.expires_at).getTime() - Date.now()) / 3600000))
+                  const isMyBid = address && bid.buyer_address.toLowerCase() === address.toLowerCase()
+                  return (
+                    <div key={bid.id} className="flex justify-between items-center mb-1">
+                      <span style={{ fontSize: '0.8rem', color: isMyBid ? '#00D4AA' : '#fff', fontWeight: isMyBid ? 700 : 400 }}>
+                        ${bid.aud_amount.toLocaleString()} AUD {isMyBid && '(yours)'}
+                      </span>
+                      <span style={{ fontSize: '0.72rem', color: '#8B8B9E' }}>⏱ {hoursLeft}hrs</span>
+                    </div>
+                  )
+                })}
+                <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #2A2A3A', display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '0.72rem', color: '#8B8B9E' }}>Spread</span>
+                  <span style={{ fontSize: '0.72rem', color: bids[0]?.aud_amount >= audPrice ? '#00D4AA' : '#F7931A' }}>
+                    ${(audPrice - bids[0]?.aud_amount).toLocaleString()} AUD ({(((audPrice - bids[0]?.aud_amount) / audPrice) * 100).toFixed(1)}%)
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Buy Now + Place Bid buttons */}
+            {address?.toLowerCase() !== listing.seller_address.toLowerCase() && (
+              <div className="flex gap-3 mb-4">
+                <button
+                  onClick={() => setShowBuyModal(true)}
+                  className="flex-1 py-4 rounded-xl font-bold text-white text-base"
+                  style={{ backgroundColor: '#F7931A' }}
+                >
+                  Buy Now
+                </button>
+                <button
+                  onClick={() => setShowBidModal(true)}
+                  className="flex-1 py-4 rounded-xl font-bold text-base"
+                  style={{ backgroundColor: 'transparent', border: '2px solid #F7931A', color: '#F7931A' }}
+                >
+                  Place Bid
+                </button>
+              </div>
+            )}
 
             <div className="rounded-lg p-4 mb-6" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
               <p className="text-xs font-semibold mb-2" style={{ color: '#00D4AA' }}>✓ How escrow works</p>
@@ -317,6 +415,58 @@ export default function ListingPage() {
           <p style={{ color: '#8B8B9E' }}>{listing.description}</p>
         </div>
       </div>
+
+      {/* ── Bid Modal ── */}
+      {showBidModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
+          <div className="rounded-xl p-6 max-w-md w-full mx-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
+            <button onClick={() => { setShowBidModal(false); setBidAmount(''); setBidSuccess(false) }} style={{ float: 'right', background: 'none', border: 'none', color: '#8B8B9E', fontSize: 20, cursor: 'pointer' }}>✕</button>
+            {bidSuccess ? (
+              <div className="text-center py-8">
+                <p style={{ fontSize: 40, marginBottom: 12 }}>🎉</p>
+                <h2 style={{ color: '#fff', fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '1.2rem', marginBottom: 8 }}>Bid Placed!</h2>
+                <p style={{ color: '#8B8B9E', fontSize: '0.88rem' }}>The seller has been notified. You will be alerted if they accept, reject, or counter your offer.</p>
+              </div>
+            ) : (
+              <>
+                <h2 style={{ color: '#fff', fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '1.2rem', marginBottom: 4 }}>Place a Bid</h2>
+                <p style={{ color: '#8B8B9E', fontSize: '0.82rem', marginBottom: 20 }}>Ask price: ${audPrice.toLocaleString()} AUD — offer below ask and the seller can accept, counter, or reject.</p>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ color: '#8B8B9E', fontSize: '0.78rem', display: 'block', marginBottom: 6 }}>Your Offer (AUD)</label>
+                  <input
+                    type="number"
+                    placeholder={`e.g. ${Math.round(audPrice * 0.9).toLocaleString()}`}
+                    value={bidAmount}
+                    onChange={e => setBidAmount(e.target.value)}
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: 10, backgroundColor: '#0A0A0F', border: '1px solid #2A2A3A', color: '#fff', fontSize: '1rem', boxSizing: 'border-box' }}
+                  />
+                  {bidAmount && parseFloat(bidAmount) > 0 && (
+                    <p style={{ color: '#00D4AA', fontSize: '0.78rem', marginTop: 6 }}>
+                      ≈ {listing.token === 'USDT' ? '' : config.symbol} {prices[listing.token] ? (parseFloat(bidAmount) / prices[listing.token]).toFixed(6) : '...'} {listing.token}
+                    </p>
+                  )}
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <label style={{ color: '#8B8B9E', fontSize: '0.78rem', display: 'block', marginBottom: 6 }}>Bid Expires In</label>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {[{ label: '24hrs', val: '24' }, { label: '48hrs', val: '48' }, { label: '7 days', val: '168' }].map(({ label, val }) => (
+                      <button key={val} onClick={() => setBidExpiry(val)} style={{ flex: 1, padding: '8px', borderRadius: 8, backgroundColor: bidExpiry === val ? '#F7931A' : '#0A0A0F', border: `1px solid ${bidExpiry === val ? '#F7931A' : '#2A2A3A'}`, color: bidExpiry === val ? '#0A0A0F' : '#8B8B9E', fontWeight: 600, fontSize: '0.82rem', cursor: 'pointer' }}>{label}</button>
+                    ))}
+                  </div>
+                </div>
+                <button
+                  onClick={handlePlaceBid}
+                  disabled={!bidAmount || parseFloat(bidAmount) <= 0 || bidSubmitting || !isConnected}
+                  style={{ width: '100%', padding: '14px', borderRadius: 12, backgroundColor: bidAmount && parseFloat(bidAmount) > 0 ? '#F7931A' : '#2A2A3A', color: '#fff', fontWeight: 800, fontSize: '1rem', border: 'none', cursor: 'pointer' }}
+                >
+                  {bidSubmitting ? 'Placing Bid...' : !isConnected ? 'Connect Wallet to Bid' : `Bid $${bidAmount ? parseFloat(bidAmount).toLocaleString() : '0'} AUD`}
+                </button>
+                <p style={{ color: '#8B8B9E', fontSize: '0.72rem', marginTop: 12, textAlign: 'center' }}>No funds leave your wallet until the seller accepts and you confirm.</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Report Button ── */}
       <div className="text-center mt-2 mb-4">
