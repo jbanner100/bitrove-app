@@ -33,6 +33,52 @@ export default function TradesPage() {
   const [buyerTrades, setBuyerTrades] = useState<any[]>([])
   const [sellerTrades, setSellerTrades] = useState<any[]>([])
   const [sellerListings, setSellerListings] = useState<any[]>([])
+  const [listingBids, setListingBids] = useState<Record<string, any[]>>({})
+  const [counterAmounts, setCounterAmounts] = useState<Record<string, string>>({})
+
+  const fetchBids = async (listingIds: string[]) => {
+    if (!listingIds.length) return
+    const { data } = await supabase
+      .from('bids')
+      .select('*')
+      .in('listing_id', listingIds)
+      .eq('status', 'pending')
+      .order('aud_amount', { ascending: false })
+    if (data) {
+      const grouped: Record<string, any[]> = {}
+      data.forEach((bid: any) => {
+        if (!grouped[bid.listing_id]) grouped[bid.listing_id] = []
+        grouped[bid.listing_id].push(bid)
+      })
+      setListingBids(grouped)
+    }
+  }
+
+  const handleAcceptBid = async (bid: any, listing: any) => {
+    if (!window.confirm(`Accept bid of $${bid.aud_amount.toLocaleString()} AUD from ${bid.buyer_address.slice(0,6)}...${bid.buyer_address.slice(-4)}?`)) return
+    await supabase.from('bids').update({ status: 'accepted' }).eq('id', bid.id)
+    await supabase.from('bids').update({ status: 'rejected' }).eq('listing_id', listing.id).neq('id', bid.id)
+    await supabase.from('listings').update({ aud_price: bid.aud_amount }).eq('id', listing.id)
+    alert('Bid accepted! The buyer has been notified and can now complete the purchase at the agreed price.')
+    fetchBids(sellerListings.map((l: any) => l.id))
+  }
+
+  const handleRejectBid = async (bid: any) => {
+    await supabase.from('bids').update({ status: 'rejected' }).eq('id', bid.id)
+    setListingBids(prev => ({
+      ...prev,
+      [bid.listing_id]: (prev[bid.listing_id] || []).filter((b: any) => b.id !== bid.id)
+    }))
+  }
+
+  const handleCounterBid = async (bid: any) => {
+    const amount = counterAmounts[bid.id]
+    if (!amount || parseFloat(amount) <= 0) return
+    await supabase.from('bids').update({ status: 'countered', counter_amount: parseFloat(amount) }).eq('id', bid.id)
+    alert(`Counter offer of $${parseFloat(amount).toLocaleString()} AUD sent to buyer.`)
+    setCounterAmounts(prev => ({ ...prev, [bid.id]: '' }))
+    fetchBids(sellerListings.map((l: any) => l.id))
+  }
   const [conversations, setConversations] = useState<any[]>([])
   const [loadingChats, setLoadingChats] = useState(false)
   const [selectedConvo, setSelectedConvo] = useState<any>(null)
@@ -66,7 +112,10 @@ export default function TradesPage() {
         .order('created_at', { ascending: false })
       if (buying) setBuyerTrades(buying)
       if (selling) setSellerTrades(selling)
-      if (listings) setSellerListings(listings)
+      if (listings) {
+        setSellerListings(listings)
+        if (listings.length > 0) fetchBids(listings.map((l: any) => l.id))
+      }
       setLoading(false)
     }
     fetchTrades()
@@ -318,6 +367,53 @@ export default function TradesPage() {
                                   🗑
                                 </button>
                               </div>
+
+                              {/* Bid Management */}
+                              {listingBids[listing.id] && listingBids[listing.id].length > 0 && (
+                                <div style={{ marginTop: 16, padding: '14px 16px', background: '#0A0A0F', borderRadius: 10, border: '1px solid #2A2A3A' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                    <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, color: '#F7931A', fontSize: '0.82rem' }}>
+                                      📊 {listingBids[listing.id].length} Active Bid{listingBids[listing.id].length !== 1 ? 's' : ''}
+                                    </span>
+                                    <button
+                                      onClick={() => handleAcceptBid(listingBids[listing.id][0], listing)}
+                                      style={{ fontSize: '0.72rem', fontWeight: 700, padding: '4px 12px', borderRadius: 6, backgroundColor: '#00D4AA', color: '#0A0A0F', border: 'none', cursor: 'pointer' }}
+                                    >
+                                      ⚡ Accept Best Bid
+                                    </button>
+                                  </div>
+                                  {listingBids[listing.id].map((bid: any) => {
+                                    const hoursLeft = Math.max(0, Math.round((new Date(bid.expires_at).getTime() - Date.now()) / 3600000))
+                                    return (
+                                      <div key={bid.id} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #1A1A2A' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                                          <div>
+                                            <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.9rem' }}>${bid.aud_amount.toLocaleString()} AUD</span>
+                                            <span style={{ color: '#8B8B9E', fontSize: '0.72rem', marginLeft: 8 }}>
+                                              {bid.buyer_address.slice(0,6)}...{bid.buyer_address.slice(-4)}
+                                            </span>
+                                          </div>
+                                          <span style={{ fontSize: '0.72rem', color: '#8B8B9E' }}>⏱ {hoursLeft}hrs</span>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+                                          <button onClick={() => handleAcceptBid(bid, listing)} style={{ flex: 1, padding: '6px', borderRadius: 6, backgroundColor: '#00D4AA22', border: '1px solid #00D4AA', color: '#00D4AA', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>✓ Accept</button>
+                                          <button onClick={() => handleRejectBid(bid)} style={{ flex: 1, padding: '6px', borderRadius: 6, backgroundColor: '#ff444422', border: '1px solid #ff4444', color: '#ff4444', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>✕ Reject</button>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: 6 }}>
+                                          <input
+                                            type="number"
+                                            placeholder="Counter amount (AUD)"
+                                            value={counterAmounts[bid.id] || ''}
+                                            onChange={e => setCounterAmounts(prev => ({ ...prev, [bid.id]: e.target.value }))}
+                                            style={{ flex: 1, padding: '6px 10px', borderRadius: 6, backgroundColor: '#13131A', border: '1px solid #2A2A3A', color: '#fff', fontSize: '0.78rem' }}
+                                          />
+                                          <button onClick={() => handleCounterBid(bid)} style={{ padding: '6px 12px', borderRadius: 6, backgroundColor: '#F7931A22', border: '1px solid #F7931A', color: '#F7931A', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>↩ Counter</button>
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              )}
                             </div>
                           ))}
                         </>
