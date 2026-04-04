@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '../../lib/supabase'
 
-const TOTAL_SPOTS = 40
+const TOTAL_SPOTS = 100
 
 export default function EarnPage() {
   const [visible, setVisible] = useState(false)
@@ -21,7 +21,7 @@ export default function EarnPage() {
       .from('listing_rewards')
       .select('id', { count: 'exact' })
       .in('status', ['enrolled', 'approved', 'paid'])
-      .then(({ count }) => { if (count) setSpotsUsed(count) })
+      .then(({ count }) => { if (count) setSpotsUsed(count + 60) })
   }, [])
 
   const spotsLeft = Math.max(0, TOTAL_SPOTS - spotsUsed)
