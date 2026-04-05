@@ -172,8 +172,8 @@ export default function Home() {
           <span className="text-xl font-bold" style={{ color: '#F7931A' }}>Bitrove</span>
           <div className="hidden md:flex gap-2">
             <button onClick={() => setActiveTab('buy')} className="px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ backgroundColor: activeTab === 'buy' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'buy' ? '#fff' : '#8B8B9E' }}>🛒 Buy</button>
-            <button onClick={() => setActiveTab('sell')} className="px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ backgroundColor: activeTab === 'sell' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'sell' ? '#fff' : '#8B8B9E' }}>📦 Sell</button>
-            <button onClick={() => setActiveTab('trades')} className="px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ backgroundColor: activeTab === 'trades' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'trades' ? '#fff' : '#8B8B9E' }}>My Trades</button>
+            <button onClick={() => window.location.href = '/sell'} className="px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ backgroundColor: activeTab === 'sell' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'sell' ? '#fff' : '#8B8B9E' }}>📦 Sell</button>
+            <button onClick={() => window.location.href = '/trades'} className="px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ backgroundColor: activeTab === 'trades' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'trades' ? '#fff' : '#8B8B9E' }}>My Trades</button>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -212,8 +212,8 @@ export default function Home() {
       {mobileMenuOpen && (
         <div className="md:hidden px-6 py-4 border-b flex flex-col gap-2" style={{ borderColor: '#2A2A3A', backgroundColor: '#0A0A0F' }}>
           <button onClick={() => { setActiveTab('buy'); setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'buy' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'buy' ? '#fff' : '#8B8B9E' }}>🛒 Buy</button>
-          <button onClick={() => { setActiveTab('sell'); setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'sell' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'sell' ? '#fff' : '#8B8B9E' }}>📦 Sell</button>
-          <button onClick={() => { setActiveTab('trades'); setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'trades' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'trades' ? '#fff' : '#8B8B9E' }}>My Trades</button>
+          <button onClick={() => { window.location.href = '/sell'; setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'sell' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'sell' ? '#fff' : '#8B8B9E' }}>📦 Sell</button>
+          <button onClick={() => { window.location.href = '/trades'; setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'trades' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'trades' ? '#fff' : '#8B8B9E' }}>My Trades</button>
         </div>
       )}
 
