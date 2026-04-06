@@ -311,6 +311,10 @@ export default function ListingPage() {
                   </button>
                 ))}
               </div>
+            <div className="mt-4 rounded-xl p-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
+              <h2 className="text-white font-semibold mb-2 text-sm">Description</h2>
+              <p style={{ color: '#8B8B9E', fontSize: '0.85rem', lineHeight: 1.6 }}>{listing.description}</p>
+            </div>
             )}
           </div>
 
@@ -417,10 +421,6 @@ export default function ListingPage() {
           </div>
         </div>
 
-        <div className="mt-8 rounded-xl p-6" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
-          <h2 className="text-white font-semibold mb-4">Description</h2>
-          <p style={{ color: '#8B8B9E' }}>{listing.description}</p>
-        </div>
       </div>
 
       {/* ── Bid Modal ── */}
