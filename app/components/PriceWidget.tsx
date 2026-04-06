@@ -77,7 +77,7 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
 
   const linePoints = closes.map((p, i) => `${toX(i)},${toY(p)}`).join(' ')
   const listedY = toY(listedTokenPrice)
-  const currentY = toY(currentPrice)
+  const currentY = toY(closes[closes.length - 1])
 
   // Dynamic AUD value of the item
   // item was listed at: listedTokenPrice AUD per token
