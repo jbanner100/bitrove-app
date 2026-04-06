@@ -311,12 +311,12 @@ export default function ListingPage() {
                   </button>
                 ))}
               </div>
+            )}
+          </div>
             <div className="mt-4 rounded-xl p-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
               <h2 className="text-white font-semibold mb-2 text-sm">Description</h2>
               <p style={{ color: '#8B8B9E', fontSize: '0.85rem', lineHeight: 1.6 }}>{listing.description}</p>
             </div>
-            )}
-          </div>
 
           <div>
             <div className="flex gap-2 mb-4">
