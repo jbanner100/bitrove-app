@@ -295,6 +295,7 @@ export default function ListingPage() {
       <div className="px-6 pb-16 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
+          {/* LEFT: Photos + Title + Description */}
           <div>
             <div className="w-full rounded-xl overflow-hidden flex items-center justify-center mb-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', aspectRatio: '1/1' }}>
               {listing.photos && listing.photos.length > 0 ? (
@@ -304,7 +305,7 @@ export default function ListingPage() {
               )}
             </div>
             {listing.photos && listing.photos.length > 1 && (
-              <div className="flex gap-3">
+              <div className="flex gap-3 mb-4">
                 {listing.photos.map((photo: string, i: number) => (
                   <button key={i} onClick={() => setSelectedPhoto(i)} className="w-20 h-20 rounded-lg overflow-hidden" style={{ border: `2px solid ${selectedPhoto === i ? '#F7931A' : '#2A2A3A'}` }}>
                     <img src={photo} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
@@ -312,20 +313,20 @@ export default function ListingPage() {
                 ))}
               </div>
             )}
-          </div>
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-3">
               <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', color: '#8B8B9E' }}>{listing.category}</span>
               <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#13131A', border: `1px solid ${conditionColor[listing.condition] || '#8B8B9E'}`, color: conditionColor[listing.condition] || '#8B8B9E' }}>{listing.condition}</span>
               {listing.is_featured && <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#F7931A22', border: '1px solid #F7931A', color: '#F7931A' }}>⭐ Featured</span>}
             </div>
-
-            <h1 className="text-2xl font-bold text-white mb-2">{listing.title}</h1>
-            <p className="text-sm mb-6" style={{ color: '#8B8B9E' }}>📍 {listing.location}</p>
-            <div className="mt-4 rounded-xl p-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
+            <h1 className="text-2xl font-bold text-white mb-1">{listing.title}</h1>
+            <p className="text-sm mb-4" style={{ color: '#8B8B9E' }}>📍 {listing.location}</p>
+            <div className="rounded-xl p-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
               <h2 className="text-white font-semibold mb-2 text-sm">Description</h2>
               <p style={{ color: '#8B8B9E', fontSize: '0.85rem', lineHeight: 1.6 }}>{listing.description}</p>
             </div>
+          </div>
 
+          {/* RIGHT: Price + Chart + Actions */}
           <div>
 
             <div className="rounded-xl p-4 mb-6" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
