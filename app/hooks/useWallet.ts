@@ -50,10 +50,16 @@ export function useWallet(): WalletState {
 
       // DApp Connector API v4 uses connect(networkId)
       const api = await wallet.connect('mainnet')
-      console.log('Midnight API:', api)
-      console.log('Midnight API keys:', Object.getOwnPropertyNames(api))
       
-      setMidnightAddress('connected')  // temporary - log api first
+      const shieldedAddresses = await api.getShieldedAddresses()
+      const unshieldedAddress = await api.getUnshieldedAddress()
+      const config = await api.getConfiguration()
+      
+      console.log('Shielded:', shieldedAddresses)
+      console.log('Unshielded:', unshieldedAddress)
+      console.log('Config:', config)
+      
+      setMidnightAddress(shieldedAddresses?.[0] ?? unshieldedAddress ?? null)
       setMidnightCoinPublicKey(null)
     } catch (err) {
       console.error('Midnight connect failed:', err)
