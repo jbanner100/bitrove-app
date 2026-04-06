@@ -109,7 +109,7 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
         {/* Price line */}
         <polyline points={linePoints} fill="none" stroke='#8B5CF6' strokeWidth={1.5} strokeLinejoin="round" />
         {/* Current price dot */}
-        <circle cx={W} cy={currentY} r={3.5} fill="#8B5CF6" />
+        <circle cx={W} cy={currentY} r={3.5} fill="#FFFFFF" />
       </svg>
 
       {/* Legend */}
@@ -119,7 +119,7 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
           <span style={{ fontSize: '0.68rem', color: '#8B8B9E' }}>Listed at {token} ${listedTokenPrice?.toLocaleString()}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#8B5CF6' }} />
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#FFFFFF' }} />
           <span style={{ fontSize: '0.68rem', color: '#8B8B9E' }}>Now ${currentPrice?.toLocaleString()}</span>
         </div>
       </div>
