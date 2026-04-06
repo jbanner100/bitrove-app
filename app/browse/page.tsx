@@ -422,6 +422,7 @@ export default function Home() {
                       </div>
                       <div className="p-2">
                         {item.is_featured && <div className="mb-1"><span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F7931A22', border: '1px solid #F7931A', color: '#F7931A' }}>⭐ Featured</span></div>}
+                        <div className="mb-1"><span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: item.chain === 'midnight' ? '#1A0A2E' : '#0A1A2E', border: `1px solid ${item.chain === 'midnight' ? '#7B2FBE' : '#8247E5'}`, color: item.chain === 'midnight' ? '#B06FE5' : '#8B8BE5' }}>{item.chain === 'midnight' ? '🌙 Midnight' : '🟣 Polygon'}</span></div>
                         <h3 className="text-white text-xs font-medium mb-1 truncate">{item.title}</h3>
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#0A0A0F', border: `1px solid ${config.color}`, color: config.color }}>Settles {item.token}</span>
