@@ -48,12 +48,13 @@ export function useWallet(): WalletState {
       const wallet = getMidnightWallet()
       if (!wallet) throw new Error('Lace Midnight wallet not found')
 
-      // DApp Connector API v4 uses enable() not connect()
-      const api = await wallet.enable()
-      const state = await api.state()
-
-      setMidnightAddress(state.address?.shielded ?? state.address ?? null)
-      setMidnightCoinPublicKey(state.coinPublicKey ?? null)
+      // DApp Connector API v4 uses connect(networkId)
+      const api = await wallet.connect('mainnet')
+      console.log('Midnight API:', api)
+      console.log('Midnight API keys:', Object.getOwnPropertyNames(api))
+      
+      setMidnightAddress('connected')  // temporary - log api first
+      setMidnightCoinPublicKey(null)
     } catch (err) {
       console.error('Midnight connect failed:', err)
     }
