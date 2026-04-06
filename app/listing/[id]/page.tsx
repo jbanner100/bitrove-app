@@ -56,16 +56,24 @@ export default function ListingPage() {
   useEffect(() => {
     if (!listing) return
     if (listing.token === 'USDT') return
-    const symbol = listing.token === 'BTC' ? 'BTCAUD' : 'ETHAUD'
+    const coinbasePair = listing.token === 'BTC' ? 'BTC-AUD' : 'ETH-AUD'
     const fetchCandles = async () => {
       try {
-        const [candleRes, priceRes] = await Promise.all([
-          fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=168`),
+        const [histRes, priceRes] = await Promise.all([
+          fetch(`https://api.coinbase.com/v2/prices/${coinbasePair}/historic?period=week`),
           fetch('/api/prices'),
         ])
-        const candleData = await candleRes.json()
+        const histData = await histRes.json()
         const priceData = await priceRes.json()
-        setCandles(candleData.map((c: any) => ({ time: c[0], open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4]) })))
+        // Coinbase returns newest first — reverse so oldest is first for chart
+        const prices = [...histData.data.prices].reverse()
+        setCandles(prices.map((p: any) => ({
+          time: parseInt(p.time) * 1000,
+          open: parseFloat(p.price),
+          high: parseFloat(p.price),
+          low: parseFloat(p.price),
+          close: parseFloat(p.price),
+        })))
         setCurrentTokenPrice(listing.token === 'BTC' ? priceData.btc : priceData.eth)
       } catch (e) {}
     }
@@ -175,11 +183,12 @@ export default function ListingPage() {
   }
 
   const config = tokenConfig[listing.token as keyof typeof tokenConfig]
-  const priceMap: Record<string, number> = { BTC: prices.btc, ETH: prices.eth, USDT: prices.usdt }
-  const audPrice = listing.aud_price
   const tokenPrice = priceMap[listing.token]
-  const cryptoAmount = tokenPrice ? (audPrice / tokenPrice) : 0
+  // cryptoAmount fixed at listing time
+  const cryptoAmount = listing.listed_token_price ? (listing.aud_price / listing.listed_token_price) : (tokenPrice ? listing.aud_price / tokenPrice : 0)
   const cryptoPrice = cryptoAmount ? cryptoAmount.toFixed(6) : '...'
+  // AUD value is dynamic — updates as token price moves
+  const audPrice = listing.token === 'USDT' ? listing.aud_price : (tokenPrice && cryptoAmount ? Math.round(cryptoAmount * tokenPrice) : listing.aud_price)
 
   const generateTradeId = () => {
     const timestamp = Date.now().toString()
