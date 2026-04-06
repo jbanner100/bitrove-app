@@ -423,15 +423,20 @@ export default function Home() {
                         )}
                       </div>
                       <div className="p-2">
-                        {item.is_featured && <div className="mb-1"><span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F7931A22', border: '1px solid #F7931A', color: '#F7931A' }}>⭐ Featured</span></div>}
-                        <div className="mb-1"><span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: item.chain === 'midnight' ? '#1A0A2E' : '#0A1A2E', border: `1px solid ${item.chain === 'midnight' ? '#7B2FBE' : '#8247E5'}`, color: item.chain === 'midnight' ? '#B06FE5' : '#8B8BE5' }}>{item.chain === 'midnight' ? '🌙 Midnight' : '🟣 Polygon'}</span></div>
-                        <h3 className="text-white text-xs font-medium mb-1 truncate">{item.title}</h3>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#0A0A0F', border: `1px solid ${config.color}`, color: config.color }}>Settles {item.token}</span>
-                          <span className="text-xs" style={{ color: '#00D4AA' }}>✓ Escrow</span>
+                        {item.is_featured && <div className="mb-0.5"><span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: '#F7931A22', border: '1px solid #F7931A', color: '#F7931A' }}>⭐ Featured</span></div>}
+                        {/* Row 1: Chain + Token + Escrow */}
+                        <div className="flex items-center gap-1 mb-1 flex-wrap">
+                          <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: item.chain === 'midnight' ? '#1A0A2E' : '#0A1A2E', border: `1px solid ${item.chain === 'midnight' ? '#7B2FBE' : '#8247E5'}`, color: item.chain === 'midnight' ? '#B06FE5' : '#8B8BE5' }}>{item.chain === 'midnight' ? '🌙 Midnight' : '🟣 Polygon'}</span>
+                          <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: '#0A0A0F', border: `1px solid ${config.color}`, color: config.color }}>{item.token}</span>
+                          <span className="text-xs ml-auto" style={{ color: '#00D4AA' }}>✓ Escrow</span>
                         </div>
-                        <p className="font-bold text-base" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
-                        <p className="text-xs" style={{ color: '#8B8B9E' }}>≈ {currencySymbols[currency]}{liveAud} {currency}</p>
+                        {/* Row 2: Title */}
+                        <h3 className="text-white text-xs font-medium mb-1 truncate">{item.title}</h3>
+                        {/* Row 3: Crypto price + Fiat */}
+                        <div className="flex items-baseline justify-between">
+                          <p className="font-bold text-sm" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
+                          <p className="text-xs" style={{ color: '#8B8B9E' }}>{currencySymbols[currency]}{liveAud}</p>
+                        </div>
                         {item.listed_token_price && (
                           <div className="mt-1" onClick={e => e.stopPropagation()}>
                             <PriceWidget
