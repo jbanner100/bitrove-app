@@ -16,6 +16,17 @@ export interface WalletState {
   isLaceAvailable: boolean
 }
 
+function getMidnightWallet(): any {
+  const w = window as any
+  if (!w.midnight) return null
+  // DApp Connector API v4 uses dynamic UUID keys, not 'mnLace'
+  const keys = Object.keys(w.midnight)
+  if (keys.length === 0) return null
+  // Find Lace specifically, or fall back to first available wallet
+  const laceKey = keys.find(k => w.midnight[k]?.name === 'lace') ?? keys[0]
+  return w.midnight[laceKey] ?? null
+}
+
 export function useWallet(): WalletState {
   const { address: polygonAddress, isConnected: isPolygonConnected } = useAccount()
 
@@ -25,8 +36,7 @@ export function useWallet(): WalletState {
 
   useEffect(() => {
     const checkLace = () => {
-      const w = window as any
-      setIsLaceAvailable(!!(w.midnight?.mnLace))
+      setIsLaceAvailable(!!getMidnightWallet())
     }
     checkLace()
     const timer = setTimeout(checkLace, 500)
@@ -35,13 +45,15 @@ export function useWallet(): WalletState {
 
   const connectMidnight = async () => {
     try {
-      const w = window as any
-      if (!w.midnight?.mnLace) throw new Error('Lace wallet not found')
-      const api = await w.midnight.mnLace.connect('preview')
-      const addresses = await api.getShieldedAddresses()
-      const coinPublicKey = await api.getCoinPublicKey?.() ?? null
-      setMidnightAddress(addresses[0] ?? null)
-      setMidnightCoinPublicKey(coinPublicKey)
+      const wallet = getMidnightWallet()
+      if (!wallet) throw new Error('Lace Midnight wallet not found')
+
+      // DApp Connector API v4 uses enable() not connect()
+      const api = await wallet.enable()
+      const state = await api.state()
+
+      setMidnightAddress(state.address?.shielded ?? state.address ?? null)
+      setMidnightCoinPublicKey(state.coinPublicKey ?? null)
     } catch (err) {
       console.error('Midnight connect failed:', err)
     }
