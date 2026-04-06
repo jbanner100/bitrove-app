@@ -2,6 +2,7 @@
 'use client'
 
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { ConnectWalletButton } from '../components/ConnectWalletButton'
 import XMTPBadge from '../components/XMTPBadge'
 import { useXMTP } from '../contexts/XMTPContext'
 import { useState, useEffect } from 'react'
@@ -178,7 +179,7 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-3">
           <XMTPBadge />
-          <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
+          <ConnectWalletButton />
           <div style={{ position: 'relative' }}>
             <select
               value={currency}
@@ -214,6 +215,7 @@ export default function Home() {
           <button onClick={() => { setActiveTab('buy'); setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'buy' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'buy' ? '#fff' : '#8B8B9E' }}>🛒 Buy</button>
           <button onClick={() => { window.location.href = '/sell'; setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'sell' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'sell' ? '#fff' : '#8B8B9E' }}>📦 Sell</button>
           <button onClick={() => { window.location.href = '/trades'; setMobileMenuOpen(false) }} className="w-full px-4 py-3 rounded-lg text-sm font-medium text-left" style={{ backgroundColor: activeTab === 'trades' ? '#F7931A' : '#13131A', border: '1px solid #2A2A3A', color: activeTab === 'trades' ? '#fff' : '#8B8B9E' }}>My Trades</button>
+          <div className="pt-2 border-t" style={{ borderColor: '#2A2A3A' }}><ConnectWalletButton /></div>
         </div>
       )}
 
