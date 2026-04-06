@@ -313,12 +313,6 @@ export default function ListingPage() {
               </div>
             )}
           </div>
-            <div className="mt-4 rounded-xl p-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
-              <h2 className="text-white font-semibold mb-2 text-sm">Description</h2>
-              <p style={{ color: '#8B8B9E', fontSize: '0.85rem', lineHeight: 1.6 }}>{listing.description}</p>
-            </div>
-
-          <div>
             <div className="flex gap-2 mb-4">
               <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A', color: '#8B8B9E' }}>{listing.category}</span>
               <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#13131A', border: `1px solid ${conditionColor[listing.condition] || '#8B8B9E'}`, color: conditionColor[listing.condition] || '#8B8B9E' }}>{listing.condition}</span>
@@ -327,11 +321,16 @@ export default function ListingPage() {
 
             <h1 className="text-2xl font-bold text-white mb-2">{listing.title}</h1>
             <p className="text-sm mb-6" style={{ color: '#8B8B9E' }}>📍 {listing.location}</p>
+            <div className="mt-4 rounded-xl p-4" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
+              <h2 className="text-white font-semibold mb-2 text-sm">Description</h2>
+              <p style={{ color: '#8B8B9E', fontSize: '0.85rem', lineHeight: 1.6 }}>{listing.description}</p>
+            </div>
 
-            <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
-              <p className="text-sm mb-1" style={{ color: '#8B8B9E' }}>Settlement token</p>
-              <span className="text-xs px-2 py-1 rounded-full mb-4 inline-block" style={{ backgroundColor: '#0A0A0F', border: `1px solid ${config.color}`, color: config.color }}>{listing.token}</span>
-              <p className="text-3xl font-bold mt-3" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
+          <div>
+
+            <div className="rounded-xl p-4 mb-6" style={{ backgroundColor: '#13131A', border: '1px solid #2A2A3A' }}>
+              <span className="text-xs px-2 py-1 rounded-full mb-1 inline-block" style={{ backgroundColor: '#0A0A0F', border: `1px solid ${config.color}`, color: config.color }}>{listing.token}</span>
+              <p className="text-2xl font-bold mt-1" style={{ color: config.color }}>{config.symbol} {cryptoPrice}</p>
               <p className="text-sm mt-1" style={{ color: '#8B8B9E' }}>≈ ${audPrice.toLocaleString()} AUD</p>
               <p className="text-xs mt-1" style={{ color: '#8B8B9E' }}>Price updates every 30 seconds</p>
             </div>
