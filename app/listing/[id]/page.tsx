@@ -183,6 +183,7 @@ export default function ListingPage() {
   }
 
   const config = tokenConfig[listing.token as keyof typeof tokenConfig]
+  const priceMap: Record<string, number> = { BTC: prices.btc, ETH: prices.eth, USDT: prices.usdt }
   const tokenPrice = priceMap[listing.token]
   // cryptoAmount fixed at listing time
   const cryptoAmount = listing.listed_token_price ? (listing.aud_price / listing.listed_token_price) : (tokenPrice ? listing.aud_price / tokenPrice : 0)
