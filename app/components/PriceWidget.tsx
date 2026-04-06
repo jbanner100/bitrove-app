@@ -109,7 +109,7 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
         {/* Price line */}
         <polyline points={linePoints} fill="none" stroke='#8B5CF6' strokeWidth={1.5} strokeLinejoin="round" />
         {/* Current price dot */}
-        <circle cx={W} cy={currentY} r={3.5} fill="#FFFFFF" />
+        <circle cx={W - 2} cy={currentY} r={3.5} fill="#FFFFFF" />
       </svg>
 
       {/* Legend */}
