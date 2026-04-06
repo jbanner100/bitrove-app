@@ -89,9 +89,9 @@ export default function PriceWidget({ token, listedTokenPrice, currentPrice, can
         <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, color: '#8B8B9E', fontSize: '0.78rem' }}>
           {token === 'BTC' ? 'BTC' : 'ETH'} / AUD — 7 Day Hourly
         </span>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(0,212,170,0.1)' : 'rgba(255,68,68,0.1)', border: `1px solid ${isUp ? 'rgba(0,212,170,0.3)' : 'rgba(255,68,68,0.3)'}`, borderRadius: 6, padding: '3px 10px' }}>
-          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: isUp ? '#00D4AA' : '#ff4444' }}>
-            {isUp ? '▲' : '▼'} {absPct}% since listed
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: isUp ? 'rgba(0,212,170,0.1)' : 'rgba(255,68,68,0.1)', border: `1px solid ${isUp ? 'rgba(0,212,170,0.3)' : 'rgba(255,68,68,0.3)'}`, borderRadius: 6, padding: '3px 8px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isUp ? '#00D4AA' : '#ff4444' }}>
+            {isUp ? '▲' : '▼'} {absPct}%
           </span>
         </div>
       </div>
