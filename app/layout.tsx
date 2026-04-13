@@ -8,7 +8,7 @@ import { metaMaskWallet, coinbaseWallet, rainbowWallet, trustWallet, walletConne
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { XMTPProvider } from './contexts/XMTPContext'
-import { Analytics } from '@vercel/analytics/react'
+import { Analytics } from '@vercel/analytics/next'
 import { http, fallback } from 'wagmi'
 
 const inter = Inter({ subsets: ['latin'] })
